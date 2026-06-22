@@ -1,65 +1,237 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import React, { useEffect, useState } from 'react';
+import { useSessionStore } from '@/store/useSessionStore';
+import { usePrivy } from '@privy-io/react-auth';
+import { 
+  Menu, MessageSquare, Trophy, User, Globe, 
+  Check, Loader2, Bot, Database, FileText, Plus, X, LogOut, Compass
+} from 'lucide-react';
+import AmbientScene from '@/components/three/AmbientScene';
+import CreditMeter from '@/components/workspace/CreditMeter';
+import MessageStream from '@/components/workspace/MessageStream';
+import Composer from '@/components/workspace/Composer';
+import { motion, AnimatePresence } from 'framer-motion';
+
+export default function WorkspacePage() {
+  const { authenticated, login, logout, user } = usePrivy();
+  const initGuestSession = useSessionStore((state) => state.initGuestSession);
+  const guestId = useSessionStore((state) => state.guestId);
+  const setMessages = useSessionStore((state) => state.setMessages);
+
+  const credits = useSessionStore((state) => state.credits);
+
+  // Custom UI helper states
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'chat' | 'history' | 'profile'>('chat');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Initialize guest session
+  useEffect(() => {
+    initGuestSession();
+  }, [initGuestSession]);
+
+  const triggerToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3000);
+  };
+
+  const startNewChat = () => {
+    setMessages([]);
+    triggerToast('New Chat Session started.');
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main className="w-screen h-screen overflow-hidden flex flex-col relative bg-[#FAF1EB] font-sans">
+      {/* 3D background with slow-rotating chrome sphere & gold dust */}
+      <AmbientScene />
+
+      {/* Floating Mascot Button */}
+      <div className="absolute top-4 right-4 z-30">
+        <button
+          onClick={() => {
+            if (authenticated) {
+              setIsSidebarOpen(true);
+              triggerToast('Opening user profile drawer.');
+            } else {
+              login();
+            }
+          }}
+          className="w-9 h-9 rounded-full bg-white border border-[#EFE0D4] flex items-center justify-center text-lg hover:bg-[#FDF6F0] hover:scale-105 active:scale-95 transition-all shadow-[0_4px_12px_rgba(48,26,21,0.05)] cursor-pointer select-none"
+          title={authenticated ? `User Profile: ${user?.email?.address || 'Active'}` : 'Log In / Sign Up'}
+        >
+          
+        </button>
+      </div>
+
+      {/* Floating toast alerts */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -40, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -40, scale: 0.9 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 px-4 py-2.5 bg-white border border-[#EFE0D4] text-[#301A15] text-xs font-bold rounded-full z-50 shadow-[0_8px_24px_rgba(48,26,21,0.06)] flex items-center gap-2"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <Check className="w-3.5 h-3.5 text-[#D35E43]" />
+            {toastMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main Workspace Layout */}
+      <section className="flex-1 flex overflow-hidden relative pt-2">
+        
+        {/* Collapsible Left Sidebar (transitions between w-18 and w-64) */}
+        <motion.aside
+          onMouseEnter={() => setIsSidebarOpen(true)}
+          onMouseLeave={() => setIsSidebarOpen(false)}
+          animate={{ width: isSidebarOpen ? 260 : 72 }}
+          transition={{ type: 'spring', damping: 26, stiffness: 220 }}
+          className="h-[calc(100vh-2rem)] my-4 ml-4 bg-white border border-[#EFE0D4] rounded-[28px] flex flex-col justify-between py-6 z-20 select-none shadow-[0_8px_32px_rgba(48,26,21,0.04)] overflow-hidden shrink-0"
+        >
+          {/* Top Panel Actions */}
+          <div className="space-y-6 flex flex-col items-center w-full">
+            {/* Sidebar Top: Hamburger Menu Button and optional Xerxes Logo */}
+            <div className="flex items-center gap-3 px-5 w-full h-8 overflow-hidden">
+              <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="p-1.5 rounded-full text-[#301A15] hover:bg-[#FDF6F0] hover:text-[#D35E43] transition-all cursor-pointer shrink-0"
+                title="Toggle Sidebar"
+              >
+                <Menu className="w-4.5 h-4.5" />
+              </button>
+              {isSidebarOpen && (
+                <div className="flex items-center gap-1 select-none shrink-0">
+                  <span className="font-header font-bold text-sm tracking-tighter text-[#301A15]">
+                    xerxes
+                  </span>
+                  <span className="w-1 h-1 rounded-full bg-[#D35E43] mt-1.5" />
+                </div>
+              )}
+            </div>
+
+            {/* New Chat Button - Styled in milky white color instead of orange */}
+            <div className="px-3.5 w-full">
+              <button
+                onClick={startNewChat}
+                className="w-full h-10 bg-white border border-[#EFE0D4] hover:bg-[#FDF6F0] text-[#301A15] font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap"
+              >
+                <Plus className="w-4 h-4 shrink-0 text-[#D35E43]" />
+                {isSidebarOpen && <span>New Chat</span>}
+              </button>
+            </div>
+
+            {/* Middle Icons List with Labels (collapsible) */}
+            <div className="w-full flex flex-col gap-2 px-3">
+              {[
+                { icon: <MessageSquare className="w-4.5 h-4.5" />, label: 'Active Chat', active: true, action: () => triggerToast('Chat window focused.') }
+              ].map((item, idx) => (
+                <button
+                  key={idx}
+                  onClick={item.action}
+                  className={`w-full flex items-center gap-4 p-2.5 rounded-full transition-all cursor-pointer ${
+                    item.active 
+                      ? 'bg-[#FDF6F0] text-[#D35E43] font-bold' 
+                      : 'text-[#7E6C68]/60 hover:bg-[#FDF6F0]/60 hover:text-[#301A15]'
+                  }`}
+                >
+                  <div className="shrink-0">{item.icon}</div>
+                  {isSidebarOpen && (
+                    <span className="text-xs tracking-tight whitespace-nowrap">{item.label}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Recent Conversations List (cringe emojis removed) */}
+            {isSidebarOpen && (
+              <div className="w-full px-4 pt-3 border-t border-[#FDF6F0] space-y-2">
+                <h4 className="text-[9px] uppercase font-bold tracking-wider text-[#7E6C68]/60 font-header">
+                  Recent Threads
+                </h4>
+                <div className="space-y-1 max-h-40 overflow-y-auto pr-1">
+                  {[
+                    { title: 'Getting started with Xerxes AI' },
+                    { title: 'Document RAG Context analysis' }
+                  ].map((chat, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => triggerToast(`Opened: ${chat.title}`)}
+                      className="w-full text-left p-2 rounded-[10px] text-[11px] text-[#7E6C68] hover:bg-[#FDF6F0] hover:text-[#301A15] truncate block cursor-pointer"
+                    >
+                      {chat.title}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Bottom Panel Actions: Authentication */}
+          <div className="flex flex-col items-center gap-5 w-full">
+            {/* Privy Login status card - Inverts black/white on hover */}
+            <div className="px-3.5 w-full">
+              {authenticated ? (
+                <div className="w-full bg-white text-black border border-black rounded-[20px] p-3 flex flex-col items-center gap-2 overflow-hidden hover:bg-black hover:text-white hover:border-black transition-all duration-300">
+                  {isSidebarOpen && (
+                    <span className="text-[9px] text-[#7E6C68] font-bold uppercase tracking-wider font-mono">
+                      Logged In
+                    </span>
+                  )}
+                  <User className="w-4.5 h-4.5 shrink-0" />
+                  {isSidebarOpen && (
+                    <>
+                      <span className="text-[10px] font-semibold truncate max-w-full">
+                        {user?.email?.address || 'Active User'}
+                      </span>
+                      <span className="text-[10px] text-[#7E6C68] font-bold">
+                        Credits: <strong>{credits}</strong>
+                      </span>
+                      <button
+                        onClick={() => logout()}
+                        className="w-full py-1.5 bg-black text-white hover:bg-white hover:text-black border border-black font-bold rounded-full text-[10px] transition-all flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        Log out
+                      </button>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="w-full flex flex-col gap-2">
+                  <button
+                    onClick={() => login()}
+                    className="w-full h-10 bg-white text-black border border-black hover:bg-black hover:text-white transition-all duration-300 font-bold rounded-full text-xs flex items-center justify-center gap-2 cursor-pointer shadow-sm overflow-hidden"
+                  >
+                    <User className="w-4 h-4 shrink-0" />
+                    {isSidebarOpen && <span className="text-xs font-bold">Sign In</span>}
+                  </button>
+                  {isSidebarOpen && (
+                    <div className="text-center">
+                      <span className="text-[10px] text-[#7E6C68] font-bold">
+                        Credits: <strong>{credits}</strong>
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </motion.aside>
+
+        {/* Central Chat pane */}
+        <div className="flex-1 flex flex-col h-full max-w-2xl mx-auto px-4 py-6 relative z-10 overflow-hidden">
+          {/* Scrollable messages thread */}
+          <MessageStream />
+
+          {/* Bottom milky Composer */}
+          <div className="mt-3 w-full">
+            <Composer />
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+    </main>
   );
 }
