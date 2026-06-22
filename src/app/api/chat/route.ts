@@ -160,11 +160,69 @@ export async function POST(req: NextRequest) {
 
   let balance = 0;
   if (session.userId) {
-    const { data: p } = await supabaseServer.from('profiles').select('credits').eq('id', session.userId).single();
-    balance = p?.credits ?? 0;
-  } else {
-    const { data: g } = await supabaseServer.from('guest_sessions').select('credits').eq('guest_id', session.guestId).single();
-    balance = g?.credits ?? 0;
+    let { data: profile, error: profileErr } = await supabaseServer
+      .from('profiles')
+      .select('*')
+      .eq('id', session.userId)
+      .single();
+
+    if (profileErr || !profile) {
+      // First login: Auto-create profile and grant initial credits (500)
+      const { error: insertErr } = await supabaseServer
+        .from('profiles')
+        .insert({
+          id: session.userId,
+          credits: 0,
+        });
+
+      if (!insertErr) {
+        await supabaseServer.from('credit_transactions').insert({
+          user_id: session.userId,
+          amount: 500,
+          reason: 'Initial Sign-up Credit Grant',
+        });
+
+        const { data: newProfile } = await supabaseServer
+          .from('profiles')
+          .select('*')
+          .eq('id', session.userId)
+          .single();
+        profile = newProfile;
+      }
+    }
+    balance = profile?.credits ?? 0;
+  } else if (session.guestId) {
+    let { data: guest, error: guestErr } = await supabaseServer
+      .from('guest_sessions')
+      .select('*')
+      .eq('guest_id', session.guestId)
+      .single();
+
+    if (guestErr || !guest) {
+      // Auto-create guest session and grant initial credits (50)
+      const { error: insertErr } = await supabaseServer
+        .from('guest_sessions')
+        .insert({
+          guest_id: session.guestId,
+          credits: 0,
+        });
+
+      if (!insertErr) {
+        await supabaseServer.from('credit_transactions').insert({
+          guest_id: session.guestId,
+          amount: 50,
+          reason: 'Anonymous Guest Credit Grant',
+        });
+
+        const { data: newGuest } = await supabaseServer
+          .from('guest_sessions')
+          .select('*')
+          .eq('guest_id', session.guestId)
+          .single();
+        guest = newGuest;
+      }
+    }
+    balance = guest?.credits ?? 0;
   }
 
   // Calculate input tokens

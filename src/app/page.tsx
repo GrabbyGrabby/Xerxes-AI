@@ -20,6 +20,7 @@ export default function WorkspacePage() {
   const setMessages = useSessionStore((state) => state.setMessages);
 
   const credits = useSessionStore((state) => state.credits);
+  const setCredits = useSessionStore((state) => state.setCredits);
 
   // Custom UI helper states
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -30,6 +31,30 @@ export default function WorkspacePage() {
   useEffect(() => {
     initGuestSession();
   }, [initGuestSession]);
+
+  // Fetch and sync initial credits on mount / auth state change
+  useEffect(() => {
+    const fetchCreditsData = async () => {
+      try {
+        const token = authenticated ? await window.localStorage.getItem('privy:token') : null;
+        const headers: Record<string, string> = {};
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        if (guestId) headers['x-guest-id'] = guestId;
+
+        const res = await fetch('/api/credits', { headers });
+        if (res.ok) {
+          const data = await res.json();
+          setCredits(data.credits);
+        }
+      } catch (e) {
+        console.error('Error fetching credit balance:', e);
+      }
+    };
+
+    if (guestId || authenticated) {
+      fetchCreditsData();
+    }
+  }, [guestId, authenticated, setCredits]);
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
