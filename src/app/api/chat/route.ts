@@ -143,14 +143,8 @@ export async function POST(req: NextRequest) {
     modelId = process.env.GEMINI_API_KEY ? 'gemini-2.5-flash' : 'deepseek-ai/deepseek-v4-flash';
   }
 
-  // 3. Fetch Model pricing info & User balance
-  const { data: modelRow } = await supabaseServer
-    .from('models')
-    .select('*')
-    .eq('id', modelId)
-    .single();
-
-  const fallbackModels = [
+  // 3. Resolve Model configuration statically (database query bypassed to avoid openzen fallback errors)
+  const SUPPORTED_MODELS = [
     { id: 'minimaxai/minimax-m3', provider: 'nvidia', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 1, supports_tools: true },
     { id: 'deepseek-ai/deepseek-v4-flash', provider: 'nvidia', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 1, supports_tools: true },
     { id: 'gemini-2.5-pro', provider: 'gemini', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 2, supports_tools: true },
@@ -160,7 +154,7 @@ export async function POST(req: NextRequest) {
     { id: 'gemini-1.5-flash', provider: 'gemini', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 1, supports_tools: true }
   ];
 
-  const modelInfo = modelRow || fallbackModels.find((m) => m.id === modelId);
+  const modelInfo = SUPPORTED_MODELS.find((m) => m.id === modelId);
 
   const creditCostIn = Number(modelInfo?.credit_cost_per_1k_input ?? 1);
   const creditCostOut = Number(modelInfo?.credit_cost_per_1k_output ?? 1);
