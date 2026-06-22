@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { getAuthSession, AuthSession } from '@/lib/auth';
 import { supabaseServer } from '@/lib/supabase/server';
-import { getProvider, openZen, ChatMessage, ToolDef } from '@/lib/providers';
+import { getProvider, ChatMessage, ToolDef } from '@/lib/providers';
 import { getEncoding } from 'js-tiktoken';
 
 export const dynamic = 'force-dynamic';
@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { conversationId, messages, modelId, images } = body;
+  let { conversationId, messages, modelId, images } = body;
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return new Response(JSON.stringify({ error: 'Messages history is required' }), {
@@ -133,6 +133,16 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  // Ensure only allowed key-implemented models are requested
+  const isAllowedModel = 
+    modelId === 'minimaxai/minimax-m3' || 
+    modelId === 'deepseek-ai/deepseek-v4-flash' || 
+    modelId.startsWith('gemini-');
+
+  if (!isAllowedModel) {
+    modelId = process.env.GEMINI_API_KEY ? 'gemini-2.5-flash' : 'deepseek-ai/deepseek-v4-flash';
+  }
+
   // 3. Fetch Model pricing info & User balance
   const { data: modelRow } = await supabaseServer
     .from('models')
@@ -140,10 +150,22 @@ export async function POST(req: NextRequest) {
     .eq('id', modelId)
     .single();
 
-  const creditCostIn = Number(modelRow?.credit_cost_per_1k_input ?? 0);
-  const creditCostOut = Number(modelRow?.credit_cost_per_1k_output ?? 0);
-  const providerName = modelRow?.provider ?? 'openzen';
-  const supportsTools = modelRow?.supports_tools ?? false;
+  const fallbackModels = [
+    { id: 'minimaxai/minimax-m3', provider: 'nvidia', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 1, supports_tools: true },
+    { id: 'deepseek-ai/deepseek-v4-flash', provider: 'nvidia', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 1, supports_tools: true },
+    { id: 'gemini-2.5-pro', provider: 'gemini', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 2, supports_tools: true },
+    { id: 'gemini-2.5-flash', provider: 'gemini', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 1, supports_tools: true },
+    { id: 'gemini-2.0-flash', provider: 'gemini', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 1, supports_tools: true },
+    { id: 'gemini-1.5-pro', provider: 'gemini', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 2, supports_tools: true },
+    { id: 'gemini-1.5-flash', provider: 'gemini', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 1, supports_tools: true }
+  ];
+
+  const modelInfo = modelRow || fallbackModels.find((m) => m.id === modelId);
+
+  const creditCostIn = Number(modelInfo?.credit_cost_per_1k_input ?? 1);
+  const creditCostOut = Number(modelInfo?.credit_cost_per_1k_output ?? 1);
+  const providerName = modelInfo?.provider ?? (process.env.GEMINI_API_KEY ? 'gemini' : 'nvidia');
+  const supportsTools = modelInfo?.supports_tools ?? true;
 
   let balance = 0;
   if (session.userId) {
@@ -225,14 +247,11 @@ export async function POST(req: NextRequest) {
               }
             }
           } catch (streamError: any) {
-            // If the provider fails mid-stream (e.g. rate limit), switch to OpenZen mock
             console.error(`Provider stream error for ${providerName}:`, streamError);
-            sendSSE('info', {
-              message: `Stream error on "${providerName}": ${streamError.message}. Switching to offline backup.`,
+            sendSSE('error', {
+              message: `Stream error on "${providerName}": ${streamError.message}`,
             });
-            activeProvider = openZen;
-            toolLoopCount++;
-            continue;
+            throw streamError;
           }
 
           if (toolCallReceived && pendingToolCall) {

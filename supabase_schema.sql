@@ -147,14 +147,13 @@ create policy "Anyone can view models" on models
 -- Seed Models
 insert into models (id, provider, display_name, credit_cost_per_1k_input, credit_cost_per_1k_output, supports_vision, supports_tools, is_active)
 values
-  ('meta-llama/llama-3.3-70b-instruct:free', 'openrouter', 'Llama 3.3 70B (OR Free)', 0, 0, false, true, true),
-  ('deepseek/deepseek-chat:free', 'openrouter', 'DeepSeek V3 (OR Free)', 0, 0, false, true, true),
-  ('llama-3.3-70b-versatile', 'groq', 'Llama 3.3 70B (Groq Turbo)', 1, 2, false, true, true),
-  ('nvidia/llama-3-1-nemotron-70b-instruct', 'nvidia', 'Nemotron 70B (NVIDIA)', 1, 2, false, true, true),
   ('minimaxai/minimax-m3', 'nvidia', 'MiniMax M3 (NVIDIA)', 1, 1, true, true, true),
   ('deepseek-ai/deepseek-v4-flash', 'nvidia', 'DeepSeek V4 Flash (NVIDIA)', 1, 1, false, true, true),
-  ('deepseek-chat', 'deepseek', 'DeepSeek V3 (Direct)', 1, 1, false, true, true),
-  ('openzen-mock', 'openzen', 'OpenZen Agent (Mock)', 1, 1, true, true, true)
+  ('gemini-2.5-pro', 'gemini', 'Gemini 2.5 Pro', 1, 2, true, true, true),
+  ('gemini-2.5-flash', 'gemini', 'Gemini 2.5 Flash', 1, 1, true, true, true),
+  ('gemini-2.0-flash', 'gemini', 'Gemini 2.0 Flash', 1, 1, true, true, true),
+  ('gemini-1.5-pro', 'gemini', 'Gemini 1.5 Pro', 1, 2, true, true, true),
+  ('gemini-1.5-flash', 'gemini', 'Gemini 1.5 Flash', 1, 1, true, true, true)
 on conflict (id) do update set
   provider = excluded.provider,
   display_name = excluded.display_name,

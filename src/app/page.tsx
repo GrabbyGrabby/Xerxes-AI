@@ -5,7 +5,7 @@ import { useSessionStore } from '@/store/useSessionStore';
 import { usePrivy } from '@privy-io/react-auth';
 import { 
   Menu, MessageSquare, Trophy, User, Globe, 
-  Check, Loader2, Bot, Database, FileText, Plus, X, LogOut, Compass
+  Check, Loader2, Bot, Database, FileText, Plus, X, LogOut, Compass, LogIn
 } from 'lucide-react';
 import AmbientScene from '@/components/three/AmbientScene';
 import CreditMeter from '@/components/workspace/CreditMeter';
@@ -62,7 +62,11 @@ export default function WorkspacePage() {
           className="w-9 h-9 rounded-full bg-white border border-[#EFE0D4] flex items-center justify-center text-lg hover:bg-[#FDF6F0] hover:scale-105 active:scale-95 transition-all shadow-[0_4px_12px_rgba(48,26,21,0.05)] cursor-pointer select-none"
           title={authenticated ? `User Profile: ${user?.email?.address || 'Active'}` : 'Log In / Sign Up'}
         >
-          
+          {authenticated ? (
+            <User className="w-4 h-4 text-[#301A15]" />
+          ) : (
+            <LogIn className="w-4 h-4 text-[#301A15]" />
+          )}
         </button>
       </div>
 
@@ -101,14 +105,13 @@ export default function WorkspacePage() {
                 className="p-1.5 rounded-full text-white hover:bg-white/10 transition-all cursor-pointer shrink-0"
                 title="Toggle Sidebar"
               >
-                <Menu className="w-4.5 h-4.5" />
+                <Menu className="w-7 h-7" />
               </button>
               {isSidebarOpen && (
-                <div className="flex items-center gap-1 select-none shrink-0">
+                <div className="flex items-center select-none shrink-0">
                   <span className="font-header font-bold text-sm tracking-tighter text-white">
                     xerxes
                   </span>
-                  <span className="w-1 h-1 rounded-full bg-[#D35E43] mt-1.5" />
                 </div>
               )}
             </div>
@@ -125,22 +128,22 @@ export default function WorkspacePage() {
             </div>
 
             {/* Middle Icons List with Labels (collapsible) */}
-            <div className="w-full flex flex-col gap-2 px-3">
+            <div className="w-full flex flex-col gap-2 px-3.5">
               {[
-                { icon: <MessageSquare className="w-4.5 h-4.5" />, label: 'Active Chat', active: true, action: () => triggerToast('Chat window focused.') }
+                { icon: <MessageSquare className="w-4 h-4 shrink-0" />, label: 'Active Chat', active: true, action: () => triggerToast('Chat window focused.') }
               ].map((item, idx) => (
                 <button
                   key={idx}
                   onClick={item.action}
-                  className={`w-full flex items-center gap-4 p-2.5 rounded-full transition-all cursor-pointer ${
+                  className={`w-full h-10 border rounded-full transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap text-xs font-bold ${
                     item.active 
-                      ? 'bg-white text-[#301A15] font-bold shadow-sm' 
-                      : 'text-white/80 hover:bg-white/10 hover:text-white'
+                      ? 'bg-white text-[#301A15] border-transparent' 
+                      : 'bg-white/10 border-white/20 text-white hover:bg-white hover:text-[#301A15]'
                   }`}
                 >
                   <div className="shrink-0">{item.icon}</div>
                   {isSidebarOpen && (
-                    <span className="text-xs tracking-tight whitespace-nowrap">{item.label}</span>
+                    <span className="tracking-tight whitespace-nowrap">{item.label}</span>
                   )}
                 </button>
               ))}
@@ -203,10 +206,10 @@ export default function WorkspacePage() {
                 <div className="w-full flex flex-col gap-2">
                   <button
                     onClick={() => login()}
-                    className="w-full h-10 bg-white text-[#301A15] border border-transparent hover:bg-[#301A15] hover:text-white hover:border-white transition-all duration-300 font-bold rounded-full text-xs flex items-center justify-center gap-2 cursor-pointer shadow-sm overflow-hidden"
+                    className="w-full h-10 bg-white/10 border border-white/20 hover:bg-white hover:text-[#301A15] text-white font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap"
                   >
-                    <User className="w-4 h-4 shrink-0" />
-                    {isSidebarOpen && <span className="text-xs font-bold">Sign In</span>}
+                    <LogIn className="w-4 h-4 shrink-0" />
+                    {isSidebarOpen && <span>Sign In</span>}
                   </button>
                   {isSidebarOpen && (
                     <div className="text-center">

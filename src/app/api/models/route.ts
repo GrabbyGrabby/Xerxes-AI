@@ -28,6 +28,14 @@ export async function GET(req: NextRequest) {
         m.id === 'deepseek-ai/deepseek-v4-flash' || 
         m.provider === 'gemini'
       );
+      
+      // If there are no gemini models in the database, append them from fallbackModels
+      const hasGemini = models.some((m: any) => m.provider === 'gemini');
+      if (!hasGemini) {
+        const geminiFallbacks = fallbackModels.filter((m) => m.provider === 'gemini');
+        models = [...models, ...geminiFallbacks];
+      }
+      
       if (models.length === 0) models = fallbackModels;
     }
 
