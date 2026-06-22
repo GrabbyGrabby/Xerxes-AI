@@ -70,7 +70,7 @@ export default function MessageStream() {
                   {/* Message bubble wrapper */}
                   <div className="flex flex-col gap-1.5 max-w-[85%]">
                     <span className="text-[10px] text-[#7E6C68] font-semibold tracking-wide px-1.5 font-sans">
-                      {isUser ? (user?.email?.address || 'User') : 'yupp'}
+                      {isUser ? (user?.email?.address || 'User') : 'Xerxes'}
                     </span>
 
                     {/* Chat Bubble - Yupp theme */}

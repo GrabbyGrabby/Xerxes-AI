@@ -14,8 +14,7 @@ export const providers: Record<string, ChatProvider> = {
 export function getProvider(providerId: string): ChatProvider {
   const provider = providers[providerId.toLowerCase()];
   if (!provider) {
-    // Default to gemini or nvidia provider for safety
-    return providers.gemini || providers.nvidia;
+    throw new Error(`Provider "${providerId}" is not registered.`);
   }
   return provider;
 }

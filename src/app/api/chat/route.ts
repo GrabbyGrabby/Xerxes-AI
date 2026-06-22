@@ -133,16 +133,6 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // Ensure only allowed key-implemented models are requested
-  const isAllowedModel = 
-    modelId === 'minimaxai/minimax-m3' || 
-    modelId === 'deepseek-ai/deepseek-v4-flash' || 
-    modelId.startsWith('gemini-');
-
-  if (!isAllowedModel) {
-    modelId = process.env.GEMINI_API_KEY ? 'gemini-2.5-flash' : 'deepseek-ai/deepseek-v4-flash';
-  }
-
   // 3. Resolve Model configuration statically (database query bypassed to avoid openzen fallback errors)
   const SUPPORTED_MODELS = [
     { id: 'minimaxai/minimax-m3', provider: 'nvidia', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 1, supports_tools: true },
@@ -155,6 +145,13 @@ export async function POST(req: NextRequest) {
   ];
 
   const modelInfo = SUPPORTED_MODELS.find((m) => m.id === modelId);
+
+  if (!modelInfo) {
+    return new Response(JSON.stringify({ error: `Model "${modelId}" is not supported.` }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
   const creditCostIn = Number(modelInfo?.credit_cost_per_1k_input ?? 1);
   const creditCostOut = Number(modelInfo?.credit_cost_per_1k_output ?? 1);

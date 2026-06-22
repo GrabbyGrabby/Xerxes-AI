@@ -135,11 +135,7 @@ export default function WorkspacePage() {
                 <button
                   key={idx}
                   onClick={item.action}
-                  className={`w-full h-10 border rounded-full transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap text-xs font-bold ${
-                    item.active 
-                      ? 'bg-white text-[#301A15] border-transparent' 
-                      : 'bg-white/10 border-white/20 text-white hover:bg-white hover:text-[#301A15]'
-                  }`}
+                  className="w-full h-10 bg-white/10 border border-white/20 hover:bg-white hover:text-[#301A15] text-white font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap"
                 >
                   <div className="shrink-0">{item.icon}</div>
                   {isSidebarOpen && (
