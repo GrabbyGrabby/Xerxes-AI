@@ -37,14 +37,16 @@ export async function GET(req: NextRequest) {
       gemini: !!process.env.GEMINI_API_KEY,
     };
 
-    const modelsWithHealth = models.map((m) => {
-      const providerId = m.provider.toLowerCase();
-      const isHealthy = health[providerId as keyof typeof health] ?? false;
-      return {
-        ...m,
-        is_healthy: isHealthy,
-      };
-    });
+    const modelsWithHealth = models
+      .map((m) => {
+        const providerId = m.provider.toLowerCase();
+        const isHealthy = health[providerId as keyof typeof health] ?? false;
+        return {
+          ...m,
+          is_healthy: isHealthy,
+        };
+      })
+      .filter((m) => m.is_healthy);
 
     return NextResponse.json({ models: modelsWithHealth });
   } catch (error: any) {

@@ -184,19 +184,13 @@ export async function POST(req: NextRequest) {
         // Select LLM provider
         let activeProvider = getProvider(providerName);
         
-        // Dynamic Fallback check: If the provider is not configured, fall back to OpenZen mock
+        // Check if provider is configured (mock fallback removed)
         const isProviderConfigured =
-          providerName === 'openzen' ||
-          (providerName === 'openrouter' && process.env.OPENROUTER_API_KEY) ||
-          (providerName === 'groq' && process.env.GROQ_API_KEY) ||
           (providerName === 'nvidia' && process.env.NVIDIA_NIM_API_KEY) ||
-          (providerName === 'deepseek' && process.env.DEEPSEEK_API_KEY);
+          (providerName === 'gemini' && process.env.GEMINI_API_KEY);
 
         if (!isProviderConfigured) {
-          sendSSE('info', {
-            message: `API key for provider "${providerName}" is not configured. Falling back to simulated OpenZen agent.`,
-          });
-          activeProvider = openZen;
+          throw new Error(`API key for provider "${providerName}" is not configured in .env.local.`);
         }
 
         while (!isFinalAnswerGenerated && toolLoopCount < maxToolSteps) {

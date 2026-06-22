@@ -90,7 +90,7 @@ export default function WorkspacePage() {
           onMouseLeave={() => setIsSidebarOpen(false)}
           animate={{ width: isSidebarOpen ? 260 : 72 }}
           transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-          className="h-[calc(100vh-2rem)] my-4 ml-4 bg-white border border-[#EFE0D4] rounded-[28px] flex flex-col justify-between py-6 z-20 select-none shadow-[0_8px_32px_rgba(48,26,21,0.04)] overflow-hidden shrink-0"
+          className="h-[calc(100vh-2rem)] my-4 ml-4 bg-[#301A15] border border-[#2C1813] rounded-[28px] flex flex-col justify-between py-6 z-20 select-none shadow-[0_8px_32px_rgba(48,26,21,0.15)] overflow-hidden shrink-0 text-white"
         >
           {/* Top Panel Actions */}
           <div className="space-y-6 flex flex-col items-center w-full">
@@ -98,14 +98,14 @@ export default function WorkspacePage() {
             <div className="flex items-center gap-3 px-5 w-full h-8 overflow-hidden">
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="p-1.5 rounded-full text-[#301A15] hover:bg-[#FDF6F0] hover:text-[#D35E43] transition-all cursor-pointer shrink-0"
+                className="p-1.5 rounded-full text-white hover:bg-white/10 transition-all cursor-pointer shrink-0"
                 title="Toggle Sidebar"
               >
                 <Menu className="w-4.5 h-4.5" />
               </button>
               {isSidebarOpen && (
                 <div className="flex items-center gap-1 select-none shrink-0">
-                  <span className="font-header font-bold text-sm tracking-tighter text-[#301A15]">
+                  <span className="font-header font-bold text-sm tracking-tighter text-white">
                     xerxes
                   </span>
                   <span className="w-1 h-1 rounded-full bg-[#D35E43] mt-1.5" />
@@ -113,11 +113,11 @@ export default function WorkspacePage() {
               )}
             </div>
 
-            {/* New Chat Button - Styled in milky white color instead of orange */}
+            {/* New Chat Button - Styled in white overlay */}
             <div className="px-3.5 w-full">
               <button
                 onClick={startNewChat}
-                className="w-full h-10 bg-white border border-[#EFE0D4] hover:bg-[#FDF6F0] text-[#301A15] font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap"
+                className="w-full h-10 bg-white/10 border border-white/20 hover:bg-white hover:text-[#301A15] text-white font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap"
               >
                 <Plus className="w-4 h-4 shrink-0 text-[#D35E43]" />
                 {isSidebarOpen && <span>New Chat</span>}
@@ -134,8 +134,8 @@ export default function WorkspacePage() {
                   onClick={item.action}
                   className={`w-full flex items-center gap-4 p-2.5 rounded-full transition-all cursor-pointer ${
                     item.active 
-                      ? 'bg-[#FDF6F0] text-[#D35E43] font-bold' 
-                      : 'text-[#7E6C68]/60 hover:bg-[#FDF6F0]/60 hover:text-[#301A15]'
+                      ? 'bg-white text-[#301A15] font-bold shadow-sm' 
+                      : 'text-white/80 hover:bg-white/10 hover:text-white'
                   }`}
                 >
                   <div className="shrink-0">{item.icon}</div>
@@ -146,13 +146,13 @@ export default function WorkspacePage() {
               ))}
             </div>
 
-            {/* Recent Conversations List (cringe emojis removed) */}
+            {/* Recent Conversations List */}
             {isSidebarOpen && (
-              <div className="w-full px-4 pt-3 border-t border-[#FDF6F0] space-y-2">
-                <h4 className="text-[9px] uppercase font-bold tracking-wider text-[#7E6C68]/60 font-header">
+              <div className="w-full px-4 pt-3 border-t border-white/10 space-y-2">
+                <h4 className="text-[9px] uppercase font-bold tracking-wider text-white/40 font-header">
                   Recent Threads
                 </h4>
-                <div className="space-y-1 max-h-40 overflow-y-auto pr-1">
+                <div className="space-y-1 max-h-40 overflow-y-auto pr-1 tiny-scrollbar">
                   {[
                     { title: 'Getting started with Xerxes AI' },
                     { title: 'Document RAG Context analysis' }
@@ -160,7 +160,7 @@ export default function WorkspacePage() {
                     <button
                       key={idx}
                       onClick={() => triggerToast(`Opened: ${chat.title}`)}
-                      className="w-full text-left p-2 rounded-[10px] text-[11px] text-[#7E6C68] hover:bg-[#FDF6F0] hover:text-[#301A15] truncate block cursor-pointer"
+                      className="w-full text-left p-2 rounded-[10px] text-[11px] text-white/80 hover:bg-white/10 hover:text-white truncate block cursor-pointer"
                     >
                       {chat.title}
                     </button>
@@ -172,12 +172,12 @@ export default function WorkspacePage() {
 
           {/* Bottom Panel Actions: Authentication */}
           <div className="flex flex-col items-center gap-5 w-full">
-            {/* Privy Login status card - Inverts black/white on hover */}
+            {/* Privy Login status card - Inverts on hover */}
             <div className="px-3.5 w-full">
               {authenticated ? (
-                <div className="w-full bg-white text-black border border-black rounded-[20px] p-3 flex flex-col items-center gap-2 overflow-hidden hover:bg-black hover:text-white hover:border-black transition-all duration-300">
+                <div className="w-full bg-white/10 border border-white/20 rounded-[20px] p-3 flex flex-col items-center gap-2 overflow-hidden hover:bg-white hover:text-[#301A15] hover:border-white transition-all duration-300">
                   {isSidebarOpen && (
-                    <span className="text-[9px] text-[#7E6C68] font-bold uppercase tracking-wider font-mono">
+                    <span className="text-[9px] text-white/50 font-bold uppercase tracking-wider font-mono">
                       Logged In
                     </span>
                   )}
@@ -187,7 +187,7 @@ export default function WorkspacePage() {
                       <span className="text-[10px] font-semibold truncate max-w-full">
                         {user?.email?.address || 'Active User'}
                       </span>
-                      <span className="text-[10px] text-[#7E6C68] font-bold">
+                      <span className="text-[10px] text-white/70 font-bold">
                         Credits: <strong>{credits}</strong>
                       </span>
                       <button
@@ -203,14 +203,14 @@ export default function WorkspacePage() {
                 <div className="w-full flex flex-col gap-2">
                   <button
                     onClick={() => login()}
-                    className="w-full h-10 bg-white text-black border border-black hover:bg-black hover:text-white transition-all duration-300 font-bold rounded-full text-xs flex items-center justify-center gap-2 cursor-pointer shadow-sm overflow-hidden"
+                    className="w-full h-10 bg-white text-[#301A15] border border-transparent hover:bg-[#301A15] hover:text-white hover:border-white transition-all duration-300 font-bold rounded-full text-xs flex items-center justify-center gap-2 cursor-pointer shadow-sm overflow-hidden"
                   >
                     <User className="w-4 h-4 shrink-0" />
                     {isSidebarOpen && <span className="text-xs font-bold">Sign In</span>}
                   </button>
                   {isSidebarOpen && (
                     <div className="text-center">
-                      <span className="text-[10px] text-[#7E6C68] font-bold">
+                      <span className="text-[10px] text-white/70 font-bold">
                         Credits: <strong>{credits}</strong>
                       </span>
                     </div>
