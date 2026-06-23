@@ -108,6 +108,17 @@ export default function WorkspacePage() {
       {/* 3D background with slow-rotating chrome sphere & gold dust */}
       <AmbientScene />
 
+      {/* Mobile Hamburger Toggle */}
+      <div className="absolute top-4 left-4 z-30 md:hidden">
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="w-9 h-9 rounded-full bg-white border border-[#EFE0D4] flex items-center justify-center text-[#301A15] hover:bg-[#FDF6F0] hover:scale-105 active:scale-95 transition-all shadow-[0_4px_12px_rgba(48,26,21,0.05)] cursor-pointer select-none"
+          title="Open Sidebar"
+        >
+          <Menu className="w-4.5 h-4.5" />
+        </button>
+      </div>
+
       {/* Floating Mascot Button */}
       <div className="absolute top-4 right-4 z-30">
         <button
