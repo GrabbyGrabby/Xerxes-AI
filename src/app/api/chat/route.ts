@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  let { conversationId, messages, modelId, images } = body;
+  let { conversationId, messages, modelId, images, currentCredits } = body;
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return new Response(JSON.stringify({ error: 'Messages history is required' }), {
@@ -150,6 +150,11 @@ export async function POST(req: NextRequest) {
     { id: 'deepseek/deepseek-r1:free', provider: 'openrouter', category: 'reasoning', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: false },
     { id: 'google/gemini-2.0-flash-exp:free', provider: 'openrouter', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
     { id: 'meta-llama/llama-3.3-70b-instruct:free', provider: 'openrouter', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
+
+    // Mistral AI
+    { id: 'mistral-large-latest', provider: 'mistral', category: 'reasoning', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
+    { id: 'mistral-small-latest', provider: 'mistral', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
+    { id: 'codestral-latest', provider: 'mistral', category: 'coding', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
   ];
 
   const modelInfo = SUPPORTED_MODELS.find((m) => m.id === modelId);
@@ -166,79 +171,74 @@ export async function POST(req: NextRequest) {
   const providerName = modelInfo?.provider ?? (process.env.GEMINI_API_KEY ? 'gemini' : 'nvidia');
   const supportsTools = modelInfo?.supports_tools ?? true;
 
-  let balance = 0;
-  if (session.userId) {
-    let { data: profile, error: profileErr } = await supabaseServer
-      .from('profiles')
-      .select('*')
-      .eq('id', session.userId)
-      .single();
+  const isSupabaseConfigured = 
+    process.env.NEXT_PUBLIC_SUPABASE_URL && 
+    !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('your-supabase-project') &&
+    process.env.SUPABASE_SERVICE_ROLE_KEY &&
+    !process.env.SUPABASE_SERVICE_ROLE_KEY.includes('your-supabase-service-role-key');
 
-    if (profileErr || !profile) {
-      // First login: Auto-create profile and grant initial credits (500)
-      const { error: insertErr } = await supabaseServer
-        .from('profiles')
-        .insert({
-          id: session.userId,
-          credits: 0,
-        });
+  let balance = session.userId ? 500 : 50;
+  if (typeof currentCredits === 'number') {
+    balance = currentCredits;
+  }
 
-      if (!insertErr) {
-        await supabaseServer.from('credit_transactions').insert({
-          user_id: session.userId,
-          amount: 500,
-          reason: 'Initial Sign-up Credit Grant',
-        });
-
-        const { data: newProfile } = await supabaseServer
+  if (isSupabaseConfigured) {
+    try {
+      if (session.userId) {
+        let { data: profile } = await supabaseServer
           .from('profiles')
           .select('*')
           .eq('id', session.userId)
           .single();
-        profile = newProfile;
-      }
-    }
-    balance = profile?.credits ?? 0;
-  } else if (session.guestId) {
-    let { data: guest, error: guestErr } = await supabaseServer
-      .from('guest_sessions')
-      .select('*')
-      .eq('guest_id', session.guestId)
-      .single();
 
-    if (guestErr || !guest) {
-      // Auto-create guest session and grant initial credits (50)
-      const { error: insertErr } = await supabaseServer
-        .from('guest_sessions')
-        .insert({
-          guest_id: session.guestId,
-          credits: 0,
-        });
-
-      if (!insertErr) {
-        await supabaseServer.from('credit_transactions').insert({
-          guest_id: session.guestId,
-          amount: 50,
-          reason: 'Anonymous Guest Credit Grant',
-        });
-
-        const { data: newGuest } = await supabaseServer
+        if (!profile) {
+          // First login: Auto-create profile with 500
+          await supabaseServer.from('profiles').insert({
+            id: session.userId,
+            credits: 500,
+          });
+          await supabaseServer.from('credit_transactions').insert({
+            user_id: session.userId,
+            amount: 500,
+            reason: 'Initial Sign-up Credit Grant',
+          });
+          balance = 500;
+        } else {
+          balance = profile.credits;
+        }
+      } else if (session.guestId) {
+        let { data: guest } = await supabaseServer
           .from('guest_sessions')
           .select('*')
           .eq('guest_id', session.guestId)
           .single();
-        guest = newGuest;
+
+        if (!guest) {
+          // First login: Auto-create guest session with 50
+          await supabaseServer.from('guest_sessions').insert({
+            guest_id: session.guestId,
+            credits: 50,
+          });
+          await supabaseServer.from('credit_transactions').insert({
+            guest_id: session.guestId,
+            amount: 50,
+            reason: 'Anonymous Guest Credit Grant',
+          });
+          balance = 50;
+        } else {
+          balance = guest.credits;
+        }
       }
+    } catch (dbErr) {
+      console.error('Supabase query failed in chat, falling back to local balance:', dbErr);
     }
-    balance = guest?.credits ?? 0;
   }
 
   // Calculate input tokens
   const fullTextContext = messages.map((m) => m.content).join(' ');
   const inputTokens = enc.encode(fullTextContext).length;
-  const estimatedCost = (inputTokens * creditCostIn) / 1000;
-
-  if (balance < estimatedCost) {
+  // Cost is 1 credit = 1 message per user request, so we check if balance is >= 1
+  if (balance < 1) {
     return new Response(JSON.stringify({ error: 'Insufficient credits.' }), {
       status: 402,
       headers: { 'Content-Type': 'application/json' },
@@ -267,7 +267,8 @@ export async function POST(req: NextRequest) {
         const isProviderConfigured =
           (providerName === 'nvidia' && process.env.NVIDIA_NIM_API_KEY) ||
           (providerName === 'gemini' && process.env.GEMINI_API_KEY) ||
-          (providerName === 'openrouter' && process.env.OPENROUTER_API_KEY);
+          (providerName === 'openrouter' && process.env.OPENROUTER_API_KEY) ||
+          (providerName === 'mistral' && process.env.MISTRAL_API_KEY);
 
         if (!isProviderConfigured) {
           throw new Error(`API key for provider "${providerName}" is not configured in .env.local.`);
@@ -363,36 +364,41 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        // 5. Calculate Final Credits Spent
+        // 5. Calculate Final Credits Spent (1 credit = 1 message)
         totalOutputTokens = enc.encode(accumulatedText).length;
-        const totalCost = Math.ceil(((inputTokens * creditCostIn) + (totalOutputTokens * creditCostOut)) / 1000);
-        const finalCost = totalCost > 0 ? totalCost : 1; // min 1 credit per interaction
+        const finalCost = 1;
+        const finalBalance = balance - finalCost;
 
-        // Write spend transaction
-        const { error: ledgerError } = await supabaseServer
-          .from('credit_transactions')
-          .insert({
-            user_id: session.userId || null,
-            guest_id: session.guestId || null,
-            amount: -finalCost,
-            reason: `Chat completion using ${modelId}`,
-            model_used: modelId,
-            tokens_in: inputTokens,
-            tokens_out: totalOutputTokens,
-          });
+        if (isSupabaseConfigured) {
+          try {
+            // Write spend transaction
+            await supabaseServer
+              .from('credit_transactions')
+              .insert({
+                user_id: session.userId || null,
+                guest_id: session.guestId || null,
+                amount: -finalCost,
+                reason: `Chat completion using ${modelId}`,
+                model_used: modelId,
+                tokens_in: inputTokens,
+                tokens_out: totalOutputTokens,
+              });
 
-        if (ledgerError) {
-          console.error('Ledger spend write error:', ledgerError);
-        }
-
-        // Fetch updated balance
-        let finalBalance = balance - finalCost;
-        if (session.userId) {
-          const { data: p } = await supabaseServer.from('profiles').select('credits').eq('id', session.userId).single();
-          finalBalance = p?.credits ?? finalBalance;
-        } else {
-          const { data: g } = await supabaseServer.from('guest_sessions').select('credits').eq('guest_id', session.guestId).single();
-          finalBalance = g?.credits ?? finalBalance;
+            // Update database balance directly to match
+            if (session.userId) {
+              await supabaseServer
+                .from('profiles')
+                .update({ credits: finalBalance })
+                .eq('id', session.userId);
+            } else if (session.guestId) {
+              await supabaseServer
+                .from('guest_sessions')
+                .update({ credits: finalBalance })
+                .eq('guest_id', session.guestId);
+            }
+          } catch (dbErr) {
+            console.error('Supabase write credits failed:', dbErr);
+          }
         }
 
         // Send final transaction usage chunk

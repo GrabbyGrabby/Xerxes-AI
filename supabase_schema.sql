@@ -1,8 +1,13 @@
 -- Enable pgvector extension (for vector RAG if needed)
 create extension if not exists vector;
 
--- Drop triggers & functions if they exist
-drop trigger if exists trigger_update_credits on credit_transactions;
+-- Drop triggers & functions if they exist (safely checking if table exists first)
+do $$
+begin
+  if exists (select from pg_tables where schemaname = 'public' and tablename = 'credit_transactions') then
+    drop trigger if exists trigger_update_credits on credit_transactions;
+  end if;
+end $$;
 drop function if exists update_profile_credits();
 
 -- 1. Profiles Table

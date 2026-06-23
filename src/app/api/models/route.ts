@@ -18,6 +18,11 @@ const SUPPORTED_MODELS = [
   { id: 'deepseek/deepseek-r1:free', provider: 'openrouter', display_name: 'DeepSeek R1 (OpenRouter Free)', description: 'OpenRouter free reasoning endpoint', category: 'reasoning', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: false, supports_tools: false, is_active: true },
   { id: 'google/gemini-2.0-flash-exp:free', provider: 'openrouter', display_name: 'Gemini 2.0 Flash (OpenRouter Free)', description: 'Google Gemini via OpenRouter', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: true, supports_tools: true, is_active: true },
   { id: 'meta-llama/llama-3.3-70b-instruct:free', provider: 'openrouter', display_name: 'Llama 3.3 70B (OpenRouter Free)', description: 'Powerful Meta LLM', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: false, supports_tools: true, is_active: true },
+
+  // Mistral AI
+  { id: 'mistral-large-latest', provider: 'mistral', display_name: 'Mistral Large', description: 'Flagship reasoning and agentic model', category: 'reasoning', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: true, supports_tools: true, is_active: true },
+  { id: 'mistral-small-latest', provider: 'mistral', display_name: 'Mistral Small', description: 'Fast and efficient everyday model', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: false, supports_tools: true, is_active: true },
+  { id: 'codestral-latest', provider: 'mistral', display_name: 'Codestral', description: 'State-of-the-art coding and math model', category: 'coding', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: false, supports_tools: true, is_active: true },
 ];
 
 export async function GET(req: NextRequest) {
@@ -27,6 +32,7 @@ export async function GET(req: NextRequest) {
       nvidia: !!process.env.NVIDIA_NIM_API_KEY,
       gemini: !!process.env.GEMINI_API_KEY,
       openrouter: !!process.env.OPENROUTER_API_KEY,
+      mistral: !!process.env.MISTRAL_API_KEY,
     };
 
     const modelsWithHealth = SUPPORTED_MODELS

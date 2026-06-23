@@ -7,7 +7,7 @@ import { Paperclip, ArrowUp, Loader2, Image as ImageIcon, FileText, X } from 'lu
 import ModelPicker from './ModelPicker';
 
 export default function Composer() {
-  const { authenticated } = usePrivy();
+  const { authenticated, getAccessToken } = usePrivy();
   const guestId = useSessionStore((state) => state.guestId);
   const activeModelId = useSessionStore((state) => state.activeModelId);
   
@@ -58,7 +58,7 @@ export default function Composer() {
     setUploadStatus({ filename: file.name, progress: 'requesting_url' });
 
     try {
-      const token = authenticated ? await window.localStorage.getItem('privy:token') : null;
+      const token = authenticated ? await getAccessToken() : null;
       const urlRes = await fetch('/api/files/upload-url', {
         method: 'POST',
         headers: {
@@ -143,7 +143,7 @@ export default function Composer() {
     });
 
     try {
-      const token = authenticated ? await window.localStorage.getItem('privy:token') : null;
+      const token = authenticated ? await getAccessToken() : null;
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -155,6 +155,7 @@ export default function Composer() {
           messages: updatedMessages,
           modelId: activeModelId,
           images: imageCids,
+          currentCredits: useSessionStore.getState().credits,
         }),
       });
 

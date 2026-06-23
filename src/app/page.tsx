@@ -11,12 +11,14 @@ import AmbientScene from '@/components/three/AmbientScene';
 import CreditMeter from '@/components/workspace/CreditMeter';
 import MessageStream from '@/components/workspace/MessageStream';
 import Composer from '@/components/workspace/Composer';
+import UserDropdownCard from '@/components/workspace/UserDropdownCard';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function WorkspacePage() {
-  const { authenticated, login, logout, user, ready } = usePrivy();
+  const { authenticated, login, logout, user, ready, getAccessToken } = usePrivy();
   const initGuestSession = useSessionStore((state) => state.initGuestSession);
   const guestId = useSessionStore((state) => state.guestId);
+  const messages = useSessionStore((state) => state.messages);
   const setMessages = useSessionStore((state) => state.setMessages);
 
   const credits = useSessionStore((state) => state.credits);
@@ -36,7 +38,7 @@ export default function WorkspacePage() {
   useEffect(() => {
     const fetchCreditsData = async () => {
       try {
-        const token = authenticated ? await window.localStorage.getItem('privy:token') : null;
+        const token = authenticated ? await getAccessToken() : null;
         const headers: Record<string, string> = {};
         if (token) headers['Authorization'] = `Bearer ${token}`;
         if (guestId) headers['x-guest-id'] = guestId;
@@ -82,9 +84,13 @@ export default function WorkspacePage() {
         {/* 3D background with slow-rotating chrome sphere & gold dust */}
         <AmbientScene />
 
-        {/* Glassmorphic Centered Card */}
-        <div className="z-10 flex flex-col items-center text-center p-8 md:p-12 bg-white/20 border border-white/30 rounded-[36px] backdrop-blur-md shadow-[0_16px_48px_rgba(48,26,21,0.08)] max-w-md mx-4 select-none">
-          <h1 className="font-header text-6xl md:text-7xl font-bold text-[#301A15] tracking-wide leading-none mb-3">
+        {/* Glassmorphic Centered Card - Premium Cult UI layout with subtle border glow */}
+        <div className="z-10 flex flex-col items-center text-center p-8 md:p-12 bg-white/20 border border-white/30 rounded-[36px] backdrop-blur-md shadow-[0_16px_48px_rgba(48,26,21,0.08)] hover:shadow-[0_20px_60px_rgba(211,94,67,0.1)] transition-all duration-500 max-w-md mx-4 select-none">
+          <div className="w-24 h-24 rounded-full overflow-hidden border border-white/40 shadow-inner mb-6 bg-black">
+            <img src="/logo.jpg" alt="Xerxes AI Logo" className="w-full h-full object-cover" />
+          </div>
+          {/* Shimmering Terracotta Text Gradient Logo title */}
+          <h1 className="font-header text-6xl md:text-7xl font-bold tracking-wide leading-none mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#301A15] via-[#D35E43] to-[#301A15] drop-shadow-sm">
             Xerxes AI
           </h1>
           <p className="font-header text-sm md:text-base font-light text-[#7E6C68] tracking-widest mb-8">
@@ -93,7 +99,7 @@ export default function WorkspacePage() {
 
           <button
             onClick={() => login()}
-            className="w-48 h-12 bg-[#301A15] hover:bg-black text-white rounded-full text-sm font-medium transition-all shadow-[0_4px_16px_rgba(48,26,21,0.2)] flex items-center justify-center gap-2 cursor-pointer inside-text"
+            className="w-48 h-12 bg-[#301A15] hover:bg-black text-white rounded-full text-sm font-medium transition-all duration-300 shadow-[0_4px_16px_rgba(48,26,21,0.2)] hover:shadow-[0_4px_24px_rgba(211,94,67,0.3)] hover:scale-105 active:scale-98 flex items-center justify-center gap-2 cursor-pointer inside-text"
           >
             <LogIn className="w-4.5 h-4.5" />
             <span>Sign In</span>
@@ -119,26 +125,23 @@ export default function WorkspacePage() {
         </button>
       </div>
 
-      {/* Floating Mascot Button */}
-      <div className="absolute top-4 right-4 z-30">
-        <button
-          onClick={() => {
-            if (authenticated) {
-              setIsSidebarOpen(true);
-              triggerToast('Opening user profile drawer.');
-            } else {
-              login();
-            }
-          }}
-          className="w-9 h-9 rounded-full bg-white border border-[#EFE0D4] flex items-center justify-center text-lg hover:bg-[#FDF6F0] hover:scale-105 active:scale-95 transition-all shadow-[0_4px_12px_rgba(48,26,21,0.05)] cursor-pointer select-none"
-          title={authenticated ? `User Profile: ${user?.email?.address || 'Active'}` : 'Log In / Sign Up'}
-        >
-          {authenticated ? (
-            <User className="w-4 h-4 text-[#301A15]" />
-          ) : (
+      {/* Top Header Row / User Controls */}
+      <div className="absolute top-4 right-4 z-30 flex items-center gap-3">
+        {/* Credit Meter at the header */}
+        {(authenticated || guestId) && <CreditMeter />}
+
+        {/* User Panel: Modern dropdown card for logout */}
+        {authenticated ? (
+          <UserDropdownCard />
+        ) : (
+          <button
+            onClick={() => login()}
+            className="w-9 h-9 rounded-full bg-white border border-[#EFE0D4] flex items-center justify-center text-lg hover:bg-[#FDF6F0] hover:scale-105 active:scale-95 transition-all shadow-[0_4px_12px_rgba(48,26,21,0.05)] cursor-pointer select-none"
+            title="Log In / Sign Up"
+          >
             <LogIn className="w-4 h-4 text-[#301A15]" />
-          )}
-        </button>
+          </button>
+        )}
       </div>
 
       {/* Floating toast alerts */}
@@ -195,7 +198,7 @@ export default function WorkspacePage() {
               {isSidebarOpen && (
                 <div className="flex items-center select-none shrink-0">
                   <span className="font-header font-bold text-sm tracking-tighter text-white">
-                    xerxes
+                    Xerxes
                   </span>
                 </div>
               )}
@@ -259,28 +262,27 @@ export default function WorkspacePage() {
             {/* Privy Login status card - Inverts on hover */}
             <div className="px-3.5 w-full">
               {authenticated ? (
-                <div className="w-full bg-white/10 border border-white/20 rounded-[20px] p-3 flex flex-col items-center gap-2 overflow-hidden hover:bg-white hover:text-[#301A15] hover:border-white transition-all duration-300">
-                  {isSidebarOpen && (
-                    <span className="text-[9px] text-white/50 font-bold uppercase tracking-wider font-mono">
-                      Logged In
-                    </span>
-                  )}
-                  <User className="w-4.5 h-4.5 shrink-0" />
-                  {isSidebarOpen && (
+                <div className="w-full bg-white/10 border border-white/20 rounded-[20px] p-3 flex flex-col items-center gap-2 overflow-hidden transition-all duration-300">
+                  {isSidebarOpen ? (
                     <>
-                      <span className="text-[10px] font-semibold truncate max-w-full">
+                      <span className="text-[10px] font-semibold truncate max-w-full text-white/90">
                         {user?.email?.address || 'Active User'}
-                      </span>
-                      <span className="text-[10px] text-white/70 font-bold">
-                        Credits: <strong>{credits}</strong>
                       </span>
                       <button
                         onClick={() => logout()}
-                        className="w-full py-1.5 bg-black text-white hover:bg-white hover:text-black border border-black font-bold rounded-full text-[10px] transition-all flex items-center justify-center gap-1 cursor-pointer"
+                        className="w-full py-1.5 bg-black text-white border border-black font-bold rounded-full text-[10px] transition-all flex items-center justify-center gap-1 cursor-pointer hover:opacity-90"
                       >
                         Log out
                       </button>
                     </>
+                  ) : (
+                    <button
+                      onClick={() => logout()}
+                      className="p-2 bg-black text-white border border-black rounded-full transition-all flex items-center justify-center cursor-pointer hover:opacity-90"
+                      title="Log out"
+                    >
+                      <LogOut className="w-4.5 h-4.5" />
+                    </button>
                   )}
                 </div>
               ) : (
@@ -292,13 +294,6 @@ export default function WorkspacePage() {
                     <LogIn className="w-4 h-4 shrink-0" />
                     {isSidebarOpen && <span>Sign In</span>}
                   </button>
-                  {isSidebarOpen && (
-                    <div className="text-center">
-                      <span className="text-[10px] text-white/70 font-bold">
-                        Credits: <strong>{credits}</strong>
-                      </span>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -307,6 +302,39 @@ export default function WorkspacePage() {
 
         {/* Central Chat pane */}
         <div className="flex-1 flex flex-col h-full max-w-2xl mx-auto px-4 py-6 relative z-10 overflow-hidden">
+          {/* Sticky Header at the top of conversation */}
+          {messages.length > 0 && (
+            <motion.div
+              layoutId="xerxes-header-container"
+              className="flex flex-col items-center justify-center pb-0 mb-2 select-none shrink-0"
+              transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+            >
+              <div className="flex items-center gap-2">
+                <motion.div
+                  layoutId="xerxes-logo-image"
+                  className="w-6 h-6 rounded-full overflow-hidden border border-[#301A15]/10 bg-black shrink-0"
+                  transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+                >
+                  <img src="/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
+                </motion.div>
+                <motion.h2
+                  layoutId="xerxes-logo"
+                  className="font-header text-xl md:text-2xl font-bold text-[#301A15] tracking-wide leading-none"
+                  transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+                >
+                  Xerxes AI
+                </motion.h2>
+              </div>
+              <motion.p
+                layoutId="xerxes-subtitle"
+                className="font-header text-[9px] md:text-[10px] font-light text-[#7E6C68] tracking-widest mt-0.5"
+                transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+              >
+                One Agent , Your All Worklows !
+              </motion.p>
+            </motion.div>
+          )}
+
           {/* Scrollable messages thread */}
           <MessageStream />
 

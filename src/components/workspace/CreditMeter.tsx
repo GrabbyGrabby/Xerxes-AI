@@ -7,7 +7,7 @@ import { usePrivy } from '@privy-io/react-auth';
 import { History, Loader2, Info } from 'lucide-react';
 
 export default function CreditMeter() {
-  const { authenticated } = usePrivy();
+  const { authenticated, getAccessToken } = usePrivy();
   const credits = useSessionStore((state) => state.credits);
   const setCredits = useSessionStore((state) => state.setCredits);
   const guestId = useSessionStore((state) => state.guestId);
@@ -19,7 +19,7 @@ export default function CreditMeter() {
   const fetchCreditsData = async () => {
     setIsLoadingHistory(true);
     try {
-      const token = authenticated ? await window.localStorage.getItem('privy:token') : null;
+      const token = authenticated ? await getAccessToken() : null;
       const headers: Record<string, string> = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
       if (guestId) headers['x-guest-id'] = guestId;

@@ -32,26 +32,43 @@ export default function MessageStream() {
       className="flex-1 overflow-y-auto px-4 py-6 space-y-6 scrollbar-none mt-2"
     >
       {messages.length === 0 ? (
-        <div className="flex flex-col justify-center items-center text-center p-6 space-y-3 max-w-3xl mx-auto select-none my-auto min-h-[55vh]">
+        <motion.div
+          layoutId="xerxes-header-container"
+          className="flex flex-col justify-center items-center text-center p-6 space-y-3 max-w-3xl mx-auto select-none my-auto min-h-[55vh]"
+          transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+        >
+          {/* Logo image with layoutId for transition */}
+          <motion.div
+            layoutId="xerxes-logo-image"
+            initial={{ scale: 0.6, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+            className="w-20 h-20 rounded-full overflow-hidden border border-[#301A15]/10 shadow-lg mb-2 bg-black shrink-0"
+          >
+            <img src="/logo.jpg" alt="Xerxes AI Logo" className="w-full h-full object-cover" />
+          </motion.div>
+
           {/* Xerxes AI Bold Copperplate gothic */}
           <motion.h2 
+            layoutId="xerxes-logo"
             initial={{ scale: 0.8, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, type: 'spring', bounce: 0.6 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 220 }}
             className="font-header text-5xl md:text-7xl font-bold text-[#301A15] tracking-wide leading-none drop-shadow-2xl shadow-black/10"
           >
             Xerxes AI
           </motion.h2>
           {/* One Agent , Your All Worklows thin Copperplate gothic */}
           <motion.p 
+            layoutId="xerxes-subtitle"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 220 }}
             className="font-header text-sm md:text-lg font-light text-[#7E6C68] tracking-widest mt-1"
           >
             One Agent , Your All Worklows !
           </motion.p>
-        </div>
+        </motion.div>
       ) : (
         <div className="space-y-6 max-w-2xl mx-auto w-full">
           <AnimatePresence initial={false}>

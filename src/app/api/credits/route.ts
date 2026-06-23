@@ -9,100 +9,100 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    let credits = 0;
+    // Determine if Supabase URL is placeholder
+    const isSupabaseConfigured = 
+      process.env.NEXT_PUBLIC_SUPABASE_URL && 
+      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('your-supabase-project') &&
+      process.env.SUPABASE_SERVICE_ROLE_KEY &&
+      !process.env.SUPABASE_SERVICE_ROLE_KEY.includes('your-supabase-service-role-key');
+
+    let credits = session.userId ? 500 : 50;
     let transactions: any[] = [];
 
-    if (session.userId) {
-      // 1. Registered Privy User
-      // Check if profile exists
-      let { data: profile, error: profileErr } = await supabaseServer
-        .from('profiles')
-        .select('*')
-        .eq('id', session.userId)
-        .single();
-
-      if (profileErr || !profile) {
-        // First login: Auto-create profile and grant initial credits
-        const { error: insertErr } = await supabaseServer
-          .from('profiles')
-          .insert({
-            id: session.userId,
-            credits: 0, // calculated from ledger
-          });
-
-        if (!insertErr) {
-          // Add transaction row
-          await supabaseServer.from('credit_transactions').insert({
-            user_id: session.userId,
-            amount: 500,
-            reason: 'Initial Sign-up Credit Grant',
-          });
-
-          // Fetch again to get updated state
-          const { data: newProfile } = await supabaseServer
+    if (isSupabaseConfigured) {
+      try {
+        if (session.userId) {
+          // 1. Registered Privy User
+          // Check if profile exists
+          let { data: profile, error: profileErr } = await supabaseServer
             .from('profiles')
             .select('*')
             .eq('id', session.userId)
             .single();
-          profile = newProfile;
-        }
-      }
 
-      credits = profile?.credits ?? 0;
+          if (profileErr || !profile) {
+            // First login: Auto-create profile and grant initial credits (500)
+            const { error: insertErr } = await supabaseServer
+              .from('profiles')
+              .insert({
+                id: session.userId,
+                credits: 500,
+              });
 
-      // Fetch transaction ledger
-      const { data: txs } = await supabaseServer
-        .from('credit_transactions')
-        .select('*')
-        .eq('user_id', session.userId)
-        .order('created_at', { ascending: false });
-      
-      transactions = txs || [];
+            if (!insertErr) {
+              // Add transaction row
+              await supabaseServer.from('credit_transactions').insert({
+                user_id: session.userId,
+                amount: 500,
+                reason: 'Initial Sign-up Credit Grant',
+              });
+              credits = 500;
+            }
+          } else {
+            credits = profile.credits;
+          }
 
-    } else if (session.guestId) {
-      // 2. Anonymous Guest Session
-      let { data: guest, error: guestErr } = await supabaseServer
-        .from('guest_sessions')
-        .select('*')
-        .eq('guest_id', session.guestId)
-        .single();
+          // Fetch transaction ledger
+          const { data: txs } = await supabaseServer
+            .from('credit_transactions')
+            .select('*')
+            .eq('user_id', session.userId)
+            .order('created_at', { ascending: false });
+          
+          transactions = txs || [];
 
-      if (guestErr || !guest) {
-        // Auto-create guest session
-        const { error: insertErr } = await supabaseServer
-          .from('guest_sessions')
-          .insert({
-            guest_id: session.guestId,
-            credits: 0,
-          });
-
-        if (!insertErr) {
-          // Add transaction
-          await supabaseServer.from('credit_transactions').insert({
-            guest_id: session.guestId,
-            amount: 50,
-            reason: 'Anonymous Guest Credit Grant',
-          });
-
-          const { data: newGuest } = await supabaseServer
+        } else if (session.guestId) {
+          // 2. Anonymous Guest Session
+          let { data: guest, error: guestErr } = await supabaseServer
             .from('guest_sessions')
             .select('*')
             .eq('guest_id', session.guestId)
             .single();
-          guest = newGuest;
+
+          if (guestErr || !guest) {
+            // Auto-create guest session
+            const { error: insertErr } = await supabaseServer
+              .from('guest_sessions')
+              .insert({
+                guest_id: session.guestId,
+                credits: 50,
+              });
+
+            if (!insertErr) {
+              // Add transaction
+              await supabaseServer.from('credit_transactions').insert({
+                guest_id: session.guestId,
+                amount: 50,
+                reason: 'Anonymous Guest Credit Grant',
+              });
+              credits = 50;
+            }
+          } else {
+            credits = guest.credits;
+          }
+
+          // Fetch transaction ledger
+          const { data: txs } = await supabaseServer
+            .from('credit_transactions')
+            .select('*')
+            .eq('guest_id', session.guestId)
+            .order('created_at', { ascending: false });
+          
+          transactions = txs || [];
         }
+      } catch (dbErr) {
+        console.error('Supabase query failed, falling back to default credits:', dbErr);
       }
-
-      credits = guest?.credits ?? 0;
-
-      // Fetch transaction ledger
-      const { data: txs } = await supabaseServer
-        .from('credit_transactions')
-        .select('*')
-        .eq('guest_id', session.guestId)
-        .order('created_at', { ascending: false });
-      
-      transactions = txs || [];
     }
 
     return NextResponse.json({

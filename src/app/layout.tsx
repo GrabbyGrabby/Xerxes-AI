@@ -10,7 +10,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "NexusAI — Agentic Multimodal AI Workspace",
+  title: "Xerxes AI — Agentic Multimodal AI Workspace",
   description: "Experience premium multi-model LLM routing, Decentralized Pinata IPFS file tracking, and Sepolia Web3 token billing.",
 };
 
