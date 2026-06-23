@@ -2,6 +2,7 @@
 
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Environment } from '@react-three/drei';
 import * as THREE from 'three';
 
 function RotatingChromeSphere() {
@@ -22,13 +23,13 @@ function RotatingChromeSphere() {
   return (
     <mesh ref={sphereRef} position={[2.8, 0, -1]} scale={2.5}>
       <sphereGeometry args={[1, 128, 128]} />
-      {/* High reflectivity black-silver chrome */}
+      {/* High reflectivity metallic grey mirror */}
       <meshPhysicalMaterial
-        color="#15151a"
-        roughness={0.05}
+        color="#888899"
+        roughness={0.0}
         metalness={1.0}
         clearcoat={1.0}
-        clearcoatRoughness={0.05}
+        clearcoatRoughness={0.0}
         reflectivity={1.0}
       />
     </mesh>
@@ -123,6 +124,9 @@ export default function AmbientScene() {
         <directionalLight position={[5, 5, 4]} intensity={2.8} color="#ffffff" />
         <directionalLight position={[-5, 3, -2]} intensity={1.0} color="#e5e5e5" />
         <pointLight position={[0, -4, 2]} intensity={0.5} />
+        
+        {/* City mirror HDRI environment for the sphere */}
+        <Environment preset="city" />
         
         <RotatingChromeSphere />
         <ParticleField />

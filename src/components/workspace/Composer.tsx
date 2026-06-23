@@ -316,16 +316,16 @@ export default function Composer() {
             <ModelPicker />
           </div>
 
-          {/* Terracotta rounded send button */}
+          {/* Dark brown rounded send button */}
           <button
             type="submit"
             disabled={(!input.trim() && attachments.length === 0) || isStreaming}
-            className="p-2.5 bg-[#D35E43] hover:bg-[#C24F36] disabled:bg-[#FDF6F0] disabled:text-[#7E6C68]/30 active:scale-95 text-white rounded-full transition-all shadow-[0_4px_12px_rgba(211,94,67,0.25)] disabled:shadow-none cursor-pointer"
+            className="p-2.5 bg-[#301A15] hover:bg-black disabled:bg-[#FDF6F0] disabled:text-[#7E6C68]/30 active:scale-95 text-white rounded-full transition-all shadow-[0_4px_12px_rgba(48,26,21,0.25)] disabled:shadow-none cursor-pointer"
           >
             {isStreaming ? (
               <Loader2 className="w-4 h-4 animate-spin text-white" />
             ) : (
-              <ArrowUp className="w-4 h-4" />
+              <ArrowUp className="w-4 h-4 text-white" />
             )}
           </button>
         </div>

@@ -7,8 +7,9 @@ export async function* streamOpenAICompatible(params: {
   messages: ChatMessage[];
   tools?: ToolDef[];
   images?: string[];
+  headers?: Record<string, string>;
 }): AsyncIterable<StreamChunk> {
-  const { apiKey, baseUrl, model, messages, tools, images } = params;
+  const { apiKey, baseUrl, model, messages, tools, images, headers = {} } = params;
 
   // Format messages
   const formattedMessages = messages.map((msg) => {
@@ -58,6 +59,7 @@ export async function* streamOpenAICompatible(params: {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
+      ...headers,
     },
     body: JSON.stringify(requestBody),
   });

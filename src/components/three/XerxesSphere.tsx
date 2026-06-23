@@ -30,11 +30,11 @@ function SphereMesh({ size }: { size: 'small' | 'large' }) {
       <sphereGeometry args={[1, 64, 64]} />
       {/* Super shiny polished black chrome/silver metal */}
       <meshPhysicalMaterial
-        color="#08080a"
-        roughness={0.02}      // super glossy
-        metalness={1.0}       // pure metallic chrome
+        color="#ffffff"
+        roughness={0.1}      // highly glossy
+        metalness={0.3}       // balanced to look white and shiny
         clearcoat={1.0}       // high reflective lacquer
-        clearcoatRoughness={0.02}
+        clearcoatRoughness={0.1}
         reflectivity={1.0}
       />
     </mesh>

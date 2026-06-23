@@ -34,6 +34,13 @@ export default function ModelPicker() {
     is_healthy: true,
   };
 
+  const groupedModels = availableModels.reduce((acc, model) => {
+    const cat = model.category || 'chat';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(model);
+    return acc;
+  }, {} as Record<string, any[]>);
+
   return (
     <div className="relative font-sans">
       {/* Selector Button - Warm milky peach style (dot removed) */}
@@ -64,29 +71,39 @@ export default function ModelPicker() {
               </div>
 
               <div className="max-h-56 overflow-y-auto space-y-0.5 pr-1 tiny-scrollbar">
-                {availableModels.map((model) => {
-                  const isSelected = model.id === activeModelId;
-                  return (
-                    <button
-                      key={model.id}
-                      type="button"
-                      onClick={() => {
-                        setActiveModelId(model.id);
-                        setIsOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-2.5 rounded-[16px] border transition-all flex items-center justify-between select-none cursor-pointer text-xs font-semibold ${
-                        isSelected
-                          ? 'border-transparent bg-black text-white'
-                          : 'border-transparent hover:bg-black text-white/80 hover:text-white'
-                      }`}
-                    >
-                      <span className="flex items-center gap-2 truncate">
-                        <Cpu className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-white/40'}`} />
-                        {model.display_name}
-                      </span>
-                    </button>
-                  );
-                })}
+                {Object.entries(groupedModels).map(([category, models]) => (
+                  <div key={category} className="mb-2">
+                    <div className="px-3 py-1 text-[10px] uppercase font-bold text-white/50 tracking-widest">{category}</div>
+                    {(models as any[]).map((model) => {
+                      const isSelected = model.id === activeModelId;
+                      return (
+                        <button
+                          key={model.id}
+                          type="button"
+                          onClick={() => {
+                            setActiveModelId(model.id);
+                            setIsOpen(false);
+                          }}
+                          className={`w-full text-left px-3 py-2.5 rounded-[16px] border transition-all flex flex-col justify-center select-none cursor-pointer ${
+                            isSelected
+                              ? 'border-transparent bg-black text-white'
+                              : 'border-transparent hover:bg-black text-white/80 hover:text-white'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <Cpu className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-white/40'}`} />
+                            <span className="truncate text-xs font-semibold">{model.display_name}</span>
+                          </div>
+                          {model.description && (
+                            <span className={`text-[9px] mt-0.5 pl-5 opacity-60 leading-tight block ${isSelected ? 'text-white' : 'text-white/70'}`}>
+                              {model.description}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ))}
               </div>
             </motion.div>
           </>

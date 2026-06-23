@@ -26,10 +26,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           accentColor: '#a78bfa', // Curved lavender/violet violet
           showWalletLoginFirst: false,
         },
-        loginMethods: ['email', 'wallet', 'google', 'github'],
+        loginMethods: ['google', 'email', 'github'],
         embeddedWallets: {
           ethereum: {
-            createOnLogin: 'users-without-wallets',
+            createOnLogin: 'off',
           },
         },
       }}

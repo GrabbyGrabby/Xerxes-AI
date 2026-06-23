@@ -29,18 +29,28 @@ export default function MessageStream() {
   return (
     <div
       ref={containerRef}
-      className="flex-1 overflow-y-auto px-4 py-6 space-y-6 scrollbar-thin mt-2"
+      className="flex-1 overflow-y-auto px-4 py-6 space-y-6 scrollbar-none mt-2"
     >
       {messages.length === 0 ? (
         <div className="flex flex-col justify-center items-center text-center p-6 space-y-3 max-w-3xl mx-auto select-none my-auto min-h-[55vh]">
           {/* Xerxes AI Bold Copperplate gothic */}
-          <h2 className="font-header text-5xl md:text-7xl font-bold text-[#301A15] tracking-wide leading-none">
+          <motion.h2 
+            initial={{ scale: 0.8, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, type: 'spring', bounce: 0.6 }}
+            className="font-header text-5xl md:text-7xl font-bold text-[#301A15] tracking-wide leading-none drop-shadow-2xl shadow-black/10"
+          >
             Xerxes AI
-          </h2>
+          </motion.h2>
           {/* One Agent , Your All Worklows thin Copperplate gothic */}
-          <p className="font-header text-sm md:text-lg font-light text-[#7E6C68] tracking-widest mt-1">
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="font-header text-sm md:text-lg font-light text-[#7E6C68] tracking-widest mt-1"
+          >
             One Agent , Your All Worklows !
-          </p>
+          </motion.p>
         </div>
       ) : (
         <div className="space-y-6 max-w-2xl mx-auto w-full">
@@ -75,7 +85,11 @@ export default function MessageStream() {
 
                     {/* Chat Bubble - Yupp theme */}
                     <div
-                      className={`px-4.5 py-3.5 rounded-[24px] text-xs leading-relaxed border shadow-[0_4px_16px_rgba(48,26,21,0.03)] inside-text ${
+                      className={`rounded-[24px] text-xs leading-relaxed border shadow-[0_4px_16px_rgba(48,26,21,0.03)] inside-text ${
+                        msg.content === '' && isLast && isStreaming && activeToolCalls.length === 0
+                          ? 'px-3 py-1.5'
+                          : 'px-4.5 py-3.5'
+                      } ${
                         isUser
                           ? 'border-[#EFE0D4] bg-[#F5EAE1] text-[#301A15] rounded-tr-sm font-normal'
                           : 'border-[#2C1813] bg-[#301A15] text-white rounded-tl-sm'
@@ -86,7 +100,7 @@ export default function MessageStream() {
                           // Small black chrome loader sphere next to text indicator
                           <div className="flex items-center gap-2 py-1.5">
                             <XerxesSphere size="small" />
-                            <span className={`text-[10px] font-semibold font-mono animate-pulse ${isUser ? 'text-[#301A15]/60' : 'text-white/60'}`}>
+                            <span className={`text-[11px] font-bold font-mono animate-pulse ${isUser ? 'text-[#301A15]' : 'text-white'}`}>
                               Thinking...
                             </span>
                           </div>
@@ -125,31 +139,64 @@ export default function MessageStream() {
 function formatContent(text: string, isUser: boolean) {
   if (!text) return '';
 
-  const parts = text.split(/(```[\s\S]*?```)/g);
-  return parts.map((part, index) => {
-    if (part.startsWith('```')) {
-      const codeLines = part.split('\n');
-      const language = codeLines[0].slice(3).trim() || 'code';
-      const codeContent = codeLines.slice(1, -1).join('\n');
+  const blocks = [];
+  let remaining = text;
+  while (remaining) {
+    const start = remaining.indexOf('<think>');
+    if (start !== -1) {
+      if (start > 0) blocks.push({ type: 'text', content: remaining.slice(0, start) });
+      const end = remaining.indexOf('</think>', start);
+      if (end !== -1) {
+        blocks.push({ type: 'think', content: remaining.slice(start + 7, end) });
+        remaining = remaining.slice(end + 8);
+      } else {
+        blocks.push({ type: 'think', content: remaining.slice(start + 7) });
+        remaining = '';
+      }
+    } else {
+      blocks.push({ type: 'text', content: remaining });
+      break;
+    }
+  }
 
-      return <CodeBlock key={index} language={language} code={codeContent} isUser={isUser} />;
+  return blocks.map((block, blockIdx) => {
+    if (block.type === 'think') {
+      return (
+        <div key={`think-${blockIdx}`} className="flex items-center gap-2 mb-2 bg-[#261410] rounded-full py-1.5 px-3 border border-[#2C1813]/50 w-max">
+          <XerxesSphere size="small" />
+          {/* the thinking part is not visible make the text white */}
+          <span className="text-white text-[10px] hidden whitespace-pre-wrap leading-relaxed opacity-60 italic">{block.content}</span>
+          <span className="text-white text-[11px] font-bold font-mono animate-pulse">Reasoning...</span>
+        </div>
+      );
     }
 
-    const inlineParts = part.split(/(\*\*.*?\*\*)/g);
-    return (
-      <span key={index}>
-        {inlineParts.map((subPart, subIdx) => {
-          if (subPart.startsWith('**') && subPart.endsWith('**')) {
-            return (
-              <strong key={subIdx} className={`font-normal ${isUser ? 'text-[#301A15]' : 'text-white'}`}>
-                {subPart.slice(2, -2)}
-              </strong>
-            );
-          }
-          return subPart;
-        })}
-      </span>
-    );
+    const parts = block.content.split(/(```[\s\S]*?```)/g);
+    return parts.map((part, index) => {
+      if (part.startsWith('```')) {
+        const codeLines = part.split('\n');
+        const language = codeLines[0].slice(3).trim() || 'code';
+        const codeContent = codeLines.slice(1, -1).join('\n');
+
+        return <CodeBlock key={`code-${blockIdx}-${index}`} language={language} code={codeContent} isUser={isUser} />;
+      }
+
+      const inlineParts = part.split(/(\*\*.*?\*\*)/g);
+      return (
+        <span key={`text-${blockIdx}-${index}`}>
+          {inlineParts.map((subPart, subIdx) => {
+            if (subPart.startsWith('**') && subPart.endsWith('**')) {
+              return (
+                <strong key={subIdx} className={`font-normal ${isUser ? 'text-[#301A15]' : 'text-white'}`}>
+                  {subPart.slice(2, -2)}
+                </strong>
+              );
+            }
+            return subPart;
+          })}
+        </span>
+      );
+    });
   });
 }
 

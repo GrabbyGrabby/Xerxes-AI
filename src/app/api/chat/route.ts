@@ -135,13 +135,21 @@ export async function POST(req: NextRequest) {
 
   // 3. Resolve Model configuration statically (database query bypassed to avoid openzen fallback errors)
   const SUPPORTED_MODELS = [
-    { id: 'minimaxai/minimax-m3', provider: 'nvidia', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 1, supports_tools: true },
-    { id: 'deepseek-ai/deepseek-v4-flash', provider: 'nvidia', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 1, supports_tools: true },
-    { id: 'gemini-2.5-pro', provider: 'gemini', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 2, supports_tools: true },
-    { id: 'gemini-2.5-flash', provider: 'gemini', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 1, supports_tools: true },
-    { id: 'gemini-2.0-flash', provider: 'gemini', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 1, supports_tools: true },
-    { id: 'gemini-1.5-pro', provider: 'gemini', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 2, supports_tools: true },
-    { id: 'gemini-1.5-flash', provider: 'gemini', credit_cost_per_1k_input: 1, credit_cost_per_1k_output: 1, supports_tools: true }
+    // NVIDIA NIM
+    { id: 'minimaxai/minimax-m3', provider: 'nvidia', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
+    { id: 'deepseek-ai/deepseek-v4-flash', provider: 'nvidia', category: 'reasoning', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
+    
+    // Gemini
+    { id: 'gemini-2.5-pro', provider: 'gemini', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
+    { id: 'gemini-2.5-flash', provider: 'gemini', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
+    { id: 'gemini-2.0-flash', provider: 'gemini', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
+    { id: 'gemini-1.5-pro', provider: 'gemini', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
+    { id: 'gemini-1.5-flash', provider: 'gemini', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
+
+    // OpenRouter (Free)
+    { id: 'deepseek/deepseek-r1:free', provider: 'openrouter', category: 'reasoning', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: false },
+    { id: 'google/gemini-2.0-flash-exp:free', provider: 'openrouter', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
+    { id: 'meta-llama/llama-3.3-70b-instruct:free', provider: 'openrouter', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
   ];
 
   const modelInfo = SUPPORTED_MODELS.find((m) => m.id === modelId);
@@ -231,7 +239,7 @@ export async function POST(req: NextRequest) {
   const estimatedCost = (inputTokens * creditCostIn) / 1000;
 
   if (balance < estimatedCost) {
-    return new Response(JSON.stringify({ error: 'Insufficient credits. Please top up your wallet.' }), {
+    return new Response(JSON.stringify({ error: 'Insufficient credits.' }), {
       status: 402,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -258,7 +266,8 @@ export async function POST(req: NextRequest) {
         // Check if provider is configured (mock fallback removed)
         const isProviderConfigured =
           (providerName === 'nvidia' && process.env.NVIDIA_NIM_API_KEY) ||
-          (providerName === 'gemini' && process.env.GEMINI_API_KEY);
+          (providerName === 'gemini' && process.env.GEMINI_API_KEY) ||
+          (providerName === 'openrouter' && process.env.OPENROUTER_API_KEY);
 
         if (!isProviderConfigured) {
           throw new Error(`API key for provider "${providerName}" is not configured in .env.local.`);

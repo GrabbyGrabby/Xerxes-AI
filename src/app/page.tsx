@@ -14,7 +14,7 @@ import Composer from '@/components/workspace/Composer';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function WorkspacePage() {
-  const { authenticated, login, logout, user } = usePrivy();
+  const { authenticated, login, logout, user, ready } = usePrivy();
   const initGuestSession = useSessionStore((state) => state.initGuestSession);
   const guestId = useSessionStore((state) => state.guestId);
   const setMessages = useSessionStore((state) => state.setMessages);
@@ -68,6 +68,41 @@ export default function WorkspacePage() {
     triggerToast('New Chat Session started.');
   };
 
+  if (!ready) {
+    return (
+      <main className="w-screen h-screen overflow-hidden flex items-center justify-center bg-[#FAF1EB]">
+        <Loader2 className="w-8 h-8 text-[#D35E43] animate-spin" />
+      </main>
+    );
+  }
+
+  if (!authenticated) {
+    return (
+      <main className="w-screen h-screen overflow-hidden flex flex-col items-center justify-center relative bg-[#FAF1EB] font-sans">
+        {/* 3D background with slow-rotating chrome sphere & gold dust */}
+        <AmbientScene />
+
+        {/* Glassmorphic Centered Card */}
+        <div className="z-10 flex flex-col items-center text-center p-8 md:p-12 bg-white/20 border border-white/30 rounded-[36px] backdrop-blur-md shadow-[0_16px_48px_rgba(48,26,21,0.08)] max-w-md mx-4 select-none">
+          <h1 className="font-header text-6xl md:text-7xl font-bold text-[#301A15] tracking-wide leading-none mb-3">
+            Xerxes AI
+          </h1>
+          <p className="font-header text-sm md:text-base font-light text-[#7E6C68] tracking-widest mb-8">
+            One Agent , Your All Worklows !
+          </p>
+
+          <button
+            onClick={() => login()}
+            className="w-48 h-12 bg-[#301A15] hover:bg-black text-white rounded-full text-sm font-medium transition-all shadow-[0_4px_16px_rgba(48,26,21,0.2)] flex items-center justify-center gap-2 cursor-pointer inside-text"
+          >
+            <LogIn className="w-4.5 h-4.5" />
+            <span>Sign In</span>
+          </button>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="w-screen h-screen overflow-hidden flex flex-col relative bg-[#FAF1EB] font-sans">
       {/* 3D background with slow-rotating chrome sphere & gold dust */}
@@ -112,14 +147,28 @@ export default function WorkspacePage() {
 
       {/* Main Workspace Layout */}
       <section className="flex-1 flex overflow-hidden relative pt-2">
-        
+        {/* Mobile overlay backdrop */}
+        <AnimatePresence>
+          {isSidebarOpen && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsSidebarOpen(false)}
+              className="md:hidden absolute inset-0 bg-black/40 z-40 backdrop-blur-sm"
+            />
+          )}
+        </AnimatePresence>
+
         {/* Collapsible Left Sidebar (transitions between w-18 and w-64) */}
         <motion.aside
           onMouseEnter={() => setIsSidebarOpen(true)}
           onMouseLeave={() => setIsSidebarOpen(false)}
           animate={{ width: isSidebarOpen ? 260 : 72 }}
           transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-          className="h-[calc(100vh-2rem)] my-4 ml-4 bg-[#301A15] border border-[#2C1813] rounded-[28px] flex flex-col justify-between py-6 z-20 select-none shadow-[0_8px_32px_rgba(48,26,21,0.15)] overflow-hidden shrink-0 text-white"
+          className={`absolute md:relative h-[calc(100vh-2rem)] my-4 md:ml-4 bg-[#301A15] border border-[#2C1813] rounded-[28px] flex flex-col justify-between py-6 z-50 select-none shadow-[0_8px_32px_rgba(48,26,21,0.15)] overflow-hidden shrink-0 text-white transition-transform duration-300 ${
+            isSidebarOpen ? 'translate-x-4 md:translate-x-0' : '-translate-x-32 md:translate-x-0'
+          }`}
         >
           {/* Top Panel Actions */}
           <div className="space-y-6 flex flex-col items-center w-full">
