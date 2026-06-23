@@ -86,7 +86,7 @@ export default function WorkspacePage() {
 
         {/* Glassmorphic Centered Card - Premium Cult UI layout with subtle border glow */}
         <div className="z-10 flex flex-col items-center text-center p-8 md:p-12 bg-white/20 border border-white/30 rounded-[36px] backdrop-blur-md shadow-[0_16px_48px_rgba(48,26,21,0.08)] hover:shadow-[0_20px_60px_rgba(211,94,67,0.1)] transition-all duration-500 max-w-md mx-4 select-none">
-          <div className="w-24 h-24 rounded-full overflow-hidden mb-6 bg-transparent">
+          <div className="w-32 h-32 mb-6 bg-transparent">
             <img src="/logo.png" alt="Xerxes AI Logo" className="w-full h-full object-contain" />
           </div>
           {/* Shimmering Terracotta Text Gradient Logo title */}
@@ -312,7 +312,7 @@ export default function WorkspacePage() {
               <div className="flex items-center gap-2">
                 <motion.div
                   layoutId="xerxes-logo-image"
-                  className="w-6 h-6 rounded-full overflow-hidden bg-transparent shrink-0"
+                  className="w-9 h-9 bg-transparent shrink-0"
                   transition={{ type: 'spring', damping: 25, stiffness: 220 }}
                 >
                   <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />

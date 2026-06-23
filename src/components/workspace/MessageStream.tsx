@@ -43,7 +43,7 @@ export default function MessageStream() {
             initial={{ scale: 0.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="w-20 h-20 rounded-full overflow-hidden mb-2 bg-transparent shrink-0"
+            className="w-32 h-32 mb-2 bg-transparent shrink-0"
           >
             <img src="/logo.png" alt="Xerxes AI Logo" className="w-full h-full object-contain" />
           </motion.div>
