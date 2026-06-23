@@ -70,7 +70,7 @@ export default function WorkspacePage() {
 
   if (!ready) {
     return (
-      <main className="w-screen h-screen overflow-hidden flex items-center justify-center bg-[#FAF1EB]">
+      <main className="w-full h-[100dvh] overflow-hidden flex items-center justify-center bg-[#FAF1EB]">
         <Loader2 className="w-8 h-8 text-[#D35E43] animate-spin" />
       </main>
     );
@@ -78,7 +78,7 @@ export default function WorkspacePage() {
 
   if (!authenticated) {
     return (
-      <main className="w-screen h-screen overflow-hidden flex flex-col items-center justify-center relative bg-[#FAF1EB] font-sans">
+      <main className="w-full h-[100dvh] overflow-hidden flex flex-col items-center justify-center relative bg-[#FAF1EB] font-sans">
         {/* 3D background with slow-rotating chrome sphere & gold dust */}
         <AmbientScene />
 
@@ -104,7 +104,7 @@ export default function WorkspacePage() {
   }
 
   return (
-    <main className="w-screen h-screen overflow-hidden flex flex-col relative bg-[#FAF1EB] font-sans">
+    <main className="w-full h-[100dvh] overflow-hidden flex flex-col relative bg-[#FAF1EB] font-sans">
       {/* 3D background with slow-rotating chrome sphere & gold dust */}
       <AmbientScene />
 
@@ -177,7 +177,7 @@ export default function WorkspacePage() {
           onMouseLeave={() => setIsSidebarOpen(false)}
           animate={{ width: isSidebarOpen ? 260 : 72 }}
           transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-          className={`absolute md:relative h-[calc(100vh-2rem)] my-4 md:ml-4 bg-[#301A15] border border-[#2C1813] rounded-[28px] flex flex-col justify-between py-6 z-50 select-none shadow-[0_8px_32px_rgba(48,26,21,0.15)] overflow-hidden shrink-0 text-white transition-transform duration-300 ${
+          className={`absolute md:relative h-[calc(100dvh-2rem)] my-4 md:ml-4 bg-[#301A15] border border-[#2C1813] rounded-[28px] flex flex-col justify-between py-6 z-50 select-none shadow-[0_8px_32px_rgba(48,26,21,0.15)] overflow-hidden shrink-0 text-white transition-transform duration-300 ${
             isSidebarOpen ? 'translate-x-4 md:translate-x-0' : '-translate-x-32 md:translate-x-0'
           }`}
         >
