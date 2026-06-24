@@ -3,6 +3,8 @@ import { getAuthSession } from '@/lib/auth';
 import { supabaseServer } from '@/lib/supabase/server';
 import { parseFileFromUrl, chunkText } from '@/lib/parser';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
   try {
     const session = await getAuthSession(req);
