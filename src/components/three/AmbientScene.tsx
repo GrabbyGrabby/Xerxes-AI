@@ -109,7 +109,7 @@ export default function AmbientScene({ bgType = 'workspace' }: AmbientSceneProps
     setMounted(true);
   }, []);
 
-  const bgHex = bgType === 'login' ? '#FAF9F6' : '#181210';
+  const bgHex = bgType === 'login' ? '#FAF9F6' : '#000000';
 
   if (!mounted) {
     return <div className="absolute inset-0 z-[-2]" style={{ backgroundColor: bgHex }} />;

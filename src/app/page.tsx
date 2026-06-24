@@ -220,7 +220,7 @@ export default function WorkspacePage() {
   }
 
   return (
-    <main className="w-full h-[100dvh] overflow-hidden flex flex-col relative bg-[#181210] text-[#FAF1EB] font-sans">
+    <main className="w-full h-[100dvh] overflow-hidden flex flex-col relative bg-[#000000] text-[#FAF1EB] font-sans">
       {/* 3D background with rotating chrome sphere */}
       <AmbientScene />
 
@@ -297,7 +297,7 @@ export default function WorkspacePage() {
           onMouseLeave={() => setIsSidebarOpen(false)}
           animate={{ width: isSidebarOpen ? 260 : 72 }}
           transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-          className={`absolute md:relative h-[calc(100dvh-2rem)] my-4 md:ml-4 bg-[#B5CBB7] border border-[#1F110E]/15 rounded-[28px] flex flex-col justify-between py-6 z-50 select-none shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden shrink-0 text-[#1F110E] transition-transform duration-300 ${
+          className={`absolute md:relative h-[calc(100dvh-2rem)] my-4 md:ml-4 bg-[oklch(71.4%_0.014_41.2)] border border-[#1F110E]/15 rounded-[28px] flex flex-col justify-between py-6 z-50 select-none shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden shrink-0 text-[#1F110E] transition-transform duration-300 ${
             isSidebarOpen ? 'translate-x-4 md:translate-x-0' : '-translate-x-32 md:translate-x-0'
           }`}
         >

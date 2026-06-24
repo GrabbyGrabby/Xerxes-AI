@@ -291,7 +291,7 @@ export default function Composer() {
       )}
 
       {/* Premium Inverted Composer Card */}
-      <form onSubmit={handleSend} className="bg-[#B5CBB7] border border-[#1F110E]/15 rounded-[32px] p-3.5 relative shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:border-[#1F110E]/30 transition-colors duration-500">
+      <form onSubmit={handleSend} className="bg-[oklch(71.4%_0.014_41.2)] border border-[#1F110E]/15 rounded-[32px] p-3.5 relative shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:border-[#1F110E]/30 transition-colors duration-500">
         <textarea
           ref={textareaRef}
           value={input}
