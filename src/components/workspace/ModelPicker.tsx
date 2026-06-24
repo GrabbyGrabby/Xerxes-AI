@@ -47,10 +47,10 @@ export default function ModelPicker() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#4A2F29] bg-[#301A15] text-xs font-semibold text-white hover:bg-[#1F110E] hover:border-[#D35E43] transition-all duration-300 select-none shadow-[0_2px_8px_rgba(0,0,0,0.2)] cursor-pointer"
+        className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#1F110E]/15 bg-[#1F110E]/10 text-xs font-semibold text-[#1F110E] hover:bg-[#1F110E]/20 hover:border-[#1F110E]/30 transition-all duration-300 select-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer"
       >
         <span className="font-semibold tracking-tight">{activeModel.display_name}</span>
-        <ChevronDown className="w-3.5 h-3.5 opacity-60 text-white" />
+        <ChevronDown className="w-3.5 h-3.5 opacity-60 text-[#1F110E]" />
       </button>
 
       {/* Dropdown Panel - Styled in premium dark brown */}

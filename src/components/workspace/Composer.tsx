@@ -290,8 +290,8 @@ export default function Composer() {
         </div>
       )}
 
-      {/* Premium Dark Composer Card */}
-      <form onSubmit={handleSend} className="bg-[#1F110E] border border-[#4A2F29] rounded-[32px] p-3.5 relative shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:border-[#D35E43]/40 transition-colors duration-500">
+      {/* Premium Inverted Composer Card */}
+      <form onSubmit={handleSend} className="bg-[#B5CBB7] border border-[#1F110E]/15 rounded-[32px] p-3.5 relative shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:border-[#1F110E]/30 transition-colors duration-500">
         <textarea
           ref={textareaRef}
           value={input}
@@ -300,18 +300,18 @@ export default function Composer() {
           placeholder="Ask models anything..."
           rows={1}
           disabled={isStreaming}
-          className="w-full bg-transparent border-0 text-sm text-white placeholder-[#8C746E] focus:ring-0 focus:outline-none resize-none px-3.5 py-3 pr-14 leading-relaxed font-sans max-h-48 inside-text"
+          className="w-full bg-transparent border-0 text-sm text-[#1F110E] placeholder-[#1F110E]/50 focus:ring-0 focus:outline-none resize-none px-3.5 py-3 pr-14 leading-relaxed font-sans max-h-48 inside-text"
         />
 
         {/* Toolbar Row */}
-        <div className="flex items-center justify-between border-t border-[#4A2F29] pt-3 px-1 mt-2">
+        <div className="flex items-center justify-between border-t border-[#1F110E]/15 pt-3 px-1 mt-2">
           <div className="flex items-center gap-2">
             {/* Paperclip Button */}
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={isStreaming}
-              className="p-2.5 rounded-full border border-[#4A2F29] bg-[#301A15] text-white hover:bg-white hover:text-black hover:border-white transition-all duration-300 cursor-pointer disabled:opacity-50"
+              className="p-2.5 rounded-full border border-[#1F110E]/15 bg-[#1F110E]/10 text-[#1F110E] hover:bg-[#1F110E] hover:text-white hover:border-[#1F110E] transition-all duration-300 cursor-pointer disabled:opacity-50"
             >
               <Paperclip className="w-4 h-4" />
             </button>
@@ -326,16 +326,16 @@ export default function Composer() {
             <ModelPicker />
           </div>
 
-          {/* Terracotta/White Send Button */}
+          {/* Dark Brown Send Button */}
           <button
             type="submit"
             disabled={(!input.trim() && attachments.length === 0) || isStreaming}
-            className="p-2.5 bg-white hover:bg-white/90 disabled:bg-[#301A15] disabled:text-white/20 active:scale-95 text-[#1F110E] rounded-full transition-all shadow-sm cursor-pointer"
+            className="p-2.5 bg-[#1F110E] hover:bg-[#1F110E]/90 disabled:bg-[#1F110E]/20 disabled:text-[#1F110E]/30 active:scale-95 text-white rounded-full transition-all shadow-sm cursor-pointer"
           >
             {isStreaming ? (
-              <Loader2 className="w-4 h-4 animate-spin text-[#1F110E]" />
+              <Loader2 className="w-4 h-4 animate-spin text-white" />
             ) : (
-              <ArrowUp className="w-4 h-4 text-[#1F110E]" />
+              <ArrowUp className="w-4 h-4 text-white" />
             )}
           </button>
         </div>

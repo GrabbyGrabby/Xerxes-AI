@@ -219,43 +219,21 @@ export default function WorkspacePage() {
   }
 
   return (
-    <main className="w-full h-[100dvh] overflow-hidden flex flex-col relative bg-[#B5CBB7] text-[#1F110E] font-sans">
+    <main className="w-full h-[100dvh] overflow-hidden flex flex-col relative bg-[#181210] text-[#FAF1EB] font-sans">
       {/* 3D background with rotating chrome sphere */}
       <AmbientScene />
 
-      {/* MOBILE HEADER BAR: Prevents clashing and overlap on small views */}
-      <header className="md:hidden w-full h-14 bg-[#1F110E] border-b border-[#4A2F29] flex items-center justify-between px-4 z-30 shrink-0 select-none">
-        <button
-          onClick={() => setIsSidebarOpen(true)}
-          className="w-9 h-9 rounded-full bg-[#301A15] border border-[#4A2F29] flex items-center justify-center text-white hover:bg-[#301A15]/80 active:scale-95 transition-all cursor-pointer"
-          title="Open Sidebar"
-        >
-          <Menu className="w-4.5 h-4.5" />
-        </button>
+      {/* MOBILE FLOATING MENU BUTTON: Floating top-left */}
+      <button
+        onClick={() => setIsSidebarOpen(true)}
+        className="md:hidden absolute top-4 left-4 z-30 w-9 h-9 rounded-full bg-[#301A15] border border-[#4A2F29] flex items-center justify-center text-white hover:bg-[#47271F] hover:scale-105 active:scale-95 transition-all shadow-sm cursor-pointer select-none"
+        title="Open Sidebar"
+      >
+        <Menu className="w-4 h-4 text-white" />
+      </button>
 
-        <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="Logo" className="w-6 h-6 object-contain filter drop-shadow-[0_0_6px_rgba(255,255,255,0.15)]" />
-          <span className="font-header font-bold text-sm tracking-wide text-white">Xerxes AI</span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {(authenticated || isGuestMode) && <CreditMeter />}
-          {authenticated ? (
-            <UserDropdownCard />
-          ) : (
-            <button
-              onClick={() => login()}
-              className="w-9 h-9 rounded-full bg-[#301A15] border border-[#4A2F29] flex items-center justify-center text-white hover:bg-[#301A15]/80 active:scale-95 transition-all cursor-pointer"
-              title="Log In"
-            >
-              <LogIn className="w-4 h-4 text-white" />
-            </button>
-          )}
-        </div>
-      </header>
-
-      {/* DESKTOP FLOATING CONTROLS: Placed absolute top right only on md+ */}
-      <div className="hidden md:flex absolute top-4 right-4 z-30 items-center gap-3">
+      {/* FLOATING CONTROLS: Placed absolute top right for both desktop and mobile */}
+      <div className="flex absolute top-4 right-4 z-30 items-center gap-3">
         {(authenticated || isGuestMode) && <CreditMeter />}
         {authenticated ? (
           <UserDropdownCard />
@@ -306,7 +284,7 @@ export default function WorkspacePage() {
           onMouseLeave={() => setIsSidebarOpen(false)}
           animate={{ width: isSidebarOpen ? 260 : 72 }}
           transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-          className={`absolute md:relative h-[calc(100dvh-2rem)] my-4 md:ml-4 bg-[#1F110E] border border-[#4A2F29] rounded-[28px] flex flex-col justify-between py-6 z-50 select-none shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden shrink-0 text-white transition-transform duration-300 ${
+          className={`absolute md:relative h-[calc(100dvh-2rem)] my-4 md:ml-4 bg-[#B5CBB7] border border-[#1F110E]/15 rounded-[28px] flex flex-col justify-between py-6 z-50 select-none shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden shrink-0 text-[#1F110E] transition-transform duration-300 ${
             isSidebarOpen ? 'translate-x-4 md:translate-x-0' : '-translate-x-32 md:translate-x-0'
           }`}
         >
@@ -316,14 +294,14 @@ export default function WorkspacePage() {
             <div className="flex items-center gap-3 px-5 w-full h-8 overflow-hidden">
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="p-1.5 rounded-full text-white hover:bg-white/10 transition-all cursor-pointer shrink-0"
+                className="p-1.5 rounded-full text-[#1F110E] hover:bg-[#1F110E]/10 transition-all cursor-pointer shrink-0"
                 title="Toggle Sidebar"
               >
                 <Menu className="w-7 h-7" />
               </button>
               {isSidebarOpen && (
                 <div className="flex items-center select-none shrink-0">
-                  <span className="font-header font-bold text-sm tracking-wide text-white">
+                  <span className="font-header font-bold text-sm tracking-wide text-[#1F110E]">
                     Xerxes
                   </span>
                 </div>
@@ -334,7 +312,7 @@ export default function WorkspacePage() {
             <div className="px-3.5 w-full">
               <button
                 onClick={startNewChat}
-                className="w-full h-10 bg-white/10 border border-[#4A2F29] hover:bg-white hover:text-[#1F110E] text-white font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap"
+                className="w-full h-10 bg-[#1F110E]/10 border border-[#1F110E]/15 hover:bg-[#1F110E] hover:text-white text-[#1F110E] font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap"
               >
                 <Plus className="w-4 h-4 shrink-0 text-[#D35E43]" />
                 {isSidebarOpen && <span>New Chat</span>}
@@ -349,7 +327,7 @@ export default function WorkspacePage() {
                 <button
                   key={idx}
                   onClick={item.action}
-                  className="w-full h-10 bg-white/10 border border-[#4A2F29] hover:bg-white hover:text-[#1F110E] text-white font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap"
+                  className="w-full h-10 bg-[#1F110E]/10 border border-[#1F110E]/15 hover:bg-[#1F110E] hover:text-white text-[#1F110E] font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap"
                 >
                   <div className="shrink-0">{item.icon}</div>
                   {isSidebarOpen && (
@@ -361,13 +339,13 @@ export default function WorkspacePage() {
 
             {/* Recent Conversations List - Loaded from Supabase */}
             {isSidebarOpen && (
-              <div className="w-full px-4 pt-3 border-t border-[#4A2F29] space-y-2">
-                <h4 className="text-[9px] uppercase font-bold tracking-wider text-white/40 font-header">
+              <div className="w-full px-4 pt-3 border-t border-[#1F110E]/15 space-y-2">
+                <h4 className="text-[9px] uppercase font-bold tracking-wider text-[#1F110E]/40 font-header">
                   Recent Threads
                 </h4>
                 <div className="space-y-1 max-h-48 overflow-y-auto pr-1 tiny-scrollbar">
                   {conversations.length === 0 ? (
-                    <p className="text-[10px] text-white/30 text-center py-2">No threads saved.</p>
+                    <p className="text-[10px] text-[#1F110E]/30 text-center py-2">No threads saved.</p>
                   ) : (
                     conversations.map((chat) => (
                       <button
@@ -375,8 +353,8 @@ export default function WorkspacePage() {
                         onClick={() => loadConversation(chat.id)}
                         className={`w-full text-left p-2.5 rounded-[10px] text-[11px] truncate block cursor-pointer transition-all ${
                           activeConversationId === chat.id
-                            ? 'bg-white/10 text-white font-bold border-l-2 border-[#D35E43]'
-                            : 'text-white/80 hover:bg-white/5 hover:text-white'
+                            ? 'bg-[#1F110E]/10 text-[#1F110E] font-bold border-l-2 border-[#D35E43]'
+                            : 'text-[#1F110E]/80 hover:bg-[#1F110E]/5 hover:text-[#1F110E]'
                         }`}
                       >
                         {chat.title || 'Untitled Thread'}
@@ -392,15 +370,15 @@ export default function WorkspacePage() {
           <div className="flex flex-col items-center gap-5 w-full">
             <div className="px-3.5 w-full">
               {authenticated ? (
-                <div className="w-full bg-white/5 border border-[#4A2F29] rounded-[20px] p-3 flex flex-col items-center gap-2 overflow-hidden transition-all duration-300">
+                <div className="w-full bg-[#1F110E]/5 border border-[#1F110E]/15 rounded-[20px] p-3 flex flex-col items-center gap-2 overflow-hidden transition-all duration-300">
                   {isSidebarOpen ? (
                     <>
-                      <span className="text-[10px] font-semibold truncate max-w-full text-white/80">
+                      <span className="text-[10px] font-semibold truncate max-w-full text-[#1F110E]/80">
                         {user?.email?.address || 'Active User'}
                       </span>
                       <button
                         onClick={() => logout()}
-                        className="w-full py-1.5 bg-black text-white border border-black font-bold rounded-full text-[10px] transition-all flex items-center justify-center gap-1 cursor-pointer hover:opacity-90"
+                        className="w-full py-1.5 bg-[#1F110E] text-white border border-[#1F110E] font-bold rounded-full text-[10px] transition-all flex items-center justify-center gap-1 cursor-pointer hover:opacity-90"
                       >
                         Log out
                       </button>
@@ -408,7 +386,7 @@ export default function WorkspacePage() {
                   ) : (
                     <button
                       onClick={() => logout()}
-                      className="p-2 bg-black text-white border border-black rounded-full transition-all flex items-center justify-center cursor-pointer hover:opacity-90"
+                      className="p-2 bg-[#1F110E] text-white border border-[#1F110E] rounded-full transition-all flex items-center justify-center cursor-pointer hover:opacity-90"
                       title="Log out"
                     >
                       <LogOut className="w-4.5 h-4.5" />
@@ -416,15 +394,15 @@ export default function WorkspacePage() {
                   )}
                 </div>
               ) : isGuestMode ? (
-                <div className="w-full bg-white/5 border border-[#4A2F29] rounded-[20px] p-3 flex flex-col items-center gap-2 overflow-hidden transition-all duration-300">
+                <div className="w-full bg-[#1F110E]/5 border border-[#1F110E]/15 rounded-[20px] p-3 flex flex-col items-center gap-2 overflow-hidden transition-all duration-300">
                   {isSidebarOpen ? (
                     <>
-                      <span className="text-[10px] font-semibold truncate max-w-full text-white/60">
+                      <span className="text-[10px] font-semibold truncate max-w-full text-[#1F110E]/60">
                         Guest Explorer
                       </span>
                       <button
                         onClick={startNewChat}
-                        className="w-full py-1.5 bg-transparent border border-white/20 text-white font-bold rounded-full text-[10px] transition-all flex items-center justify-center gap-1 cursor-pointer hover:bg-white/5"
+                        className="w-full py-1.5 bg-transparent border border-[#1F110E]/20 text-[#1F110E] font-bold rounded-full text-[10px] transition-all flex items-center justify-center gap-1 cursor-pointer hover:bg-[#1F110E]/5"
                       >
                         Exit Mode
                       </button>
@@ -432,7 +410,7 @@ export default function WorkspacePage() {
                   ) : (
                     <button
                       onClick={startNewChat}
-                      className="p-2 bg-transparent border border-[#4A2F29] text-white rounded-full transition-all flex items-center justify-center cursor-pointer hover:bg-white/5"
+                      className="p-2 bg-transparent border border-[#1F110E]/20 text-[#1F110E] rounded-full transition-all flex items-center justify-center cursor-pointer hover:bg-[#1F110E]/5"
                       title="Exit Guest Mode"
                     >
                       <LogOut className="w-4.5 h-4.5" />
@@ -443,7 +421,7 @@ export default function WorkspacePage() {
                 <div className="w-full flex flex-col gap-2">
                   <button
                     onClick={() => login()}
-                    className="w-full h-10 bg-white/10 border border-[#4A2F29] hover:bg-white hover:text-[#1F110E] text-white font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap"
+                    className="w-full h-10 bg-[#1F110E]/10 border border-[#1F110E]/15 hover:bg-[#1F110E] hover:text-white text-[#1F110E] font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap"
                   >
                     <LogIn className="w-4 h-4 shrink-0" />
                     {isSidebarOpen && <span>Sign In</span>}
@@ -460,7 +438,7 @@ export default function WorkspacePage() {
           {messages.length > 0 && (
             <motion.div
               layoutId="xerxes-header-container"
-              className="hidden md:flex flex-col items-center justify-center pb-0 mb-2 select-none shrink-0"
+              className="flex flex-col items-center justify-center pb-0 mb-2 select-none shrink-0"
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
             >
               <div className="flex items-center gap-2">
@@ -473,7 +451,7 @@ export default function WorkspacePage() {
                 </motion.div>
                 <motion.h2
                   layoutId="xerxes-logo"
-                  className="font-header text-xl md:text-2xl font-bold text-[#1F110E] tracking-wide leading-none"
+                  className="font-header text-xl md:text-2xl font-bold text-[#FAF1EB] tracking-wide leading-none"
                   transition={{ type: 'spring', damping: 25, stiffness: 220 }}
                 >
                   Xerxes AI
@@ -481,7 +459,7 @@ export default function WorkspacePage() {
               </div>
               <motion.p
                 layoutId="xerxes-subtitle"
-                className="font-header text-[9px] md:text-[10px] font-light text-[#7E6C68] tracking-widest mt-0.5"
+                className="font-header text-[9px] md:text-[10px] font-light text-[#FAF1EB]/60 tracking-widest mt-0.5"
                 transition={{ type: 'spring', damping: 25, stiffness: 220 }}
               >
                 One Agent , Your All Worklows !

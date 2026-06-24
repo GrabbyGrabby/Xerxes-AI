@@ -54,7 +54,7 @@ export default function MessageStream() {
             initial={{ scale: 0.8, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="font-header text-5xl md:text-7xl font-bold text-[#1F110E] tracking-wide leading-none drop-shadow-2xl shadow-black/10"
+            className="font-header text-5xl md:text-7xl font-bold text-[#FAF1EB] tracking-wide leading-none drop-shadow-2xl shadow-black/10"
           >
             Xerxes AI
           </motion.h2>
@@ -64,7 +64,7 @@ export default function MessageStream() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="font-header text-sm md:text-lg font-light text-[#5C4D4A] tracking-widest mt-1"
+            className="font-header text-sm md:text-lg font-light text-[#FAF1EB]/50 tracking-widest mt-1"
           >
             One Agent , Your All Worklows !
           </motion.p>
