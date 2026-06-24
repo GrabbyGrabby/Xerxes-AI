@@ -27,18 +27,18 @@ export default function UserDropdownCard() {
 
   return (
     <div className="relative font-sans">
-      {/* Dark brown trigger button */}
+      {/* Inverted pista green trigger button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#4A2F29] bg-[#301A15] hover:border-[#D35E43] hover:bg-[#1F110E] transition-all text-xs text-white shadow-[0_2px_8px_rgba(0,0,0,0.2)] cursor-pointer select-none"
+        className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#1F110E]/15 bg-[#B5CBB7] hover:bg-[#B5CBB7]/90 transition-all text-xs text-[#1F110E] shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer select-none font-bold"
       >
-        <div className="w-5 h-5 rounded-full bg-[#1F110E] border border-white/10 flex items-center justify-center shrink-0">
-          <User className="w-3 h-3 text-white" />
+        <div className="w-5 h-5 rounded-full bg-[#1F110E]/10 border border-[#1F110E]/15 flex items-center justify-center shrink-0">
+          <User className="w-3 h-3 text-[#1F110E]" />
         </div>
         <span className="font-semibold max-w-[120px] truncate">
           {authenticated ? (user?.email?.address || 'Active User') : 'Guest Explorer'}
         </span>
-        <ChevronDown className="w-3.5 h-3.5 opacity-60 shrink-0 text-white" />
+        <ChevronDown className="w-3.5 h-3.5 opacity-60 shrink-0 text-[#1F110E]" />
       </button>
 
       {/* Dark brown dropdown panel */}

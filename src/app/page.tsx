@@ -27,6 +27,7 @@ export default function WorkspacePage() {
   const setConversations = useSessionStore((state) => state.setConversations);
   const activeConversationId = useSessionStore((state) => state.activeConversationId);
   const setActiveConversationId = useSessionStore((state) => state.setActiveConversationId);
+  const showTopControls = useSessionStore((state) => state.showTopControls);
 
   // Custom UI helper states
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -224,16 +225,28 @@ export default function WorkspacePage() {
       <AmbientScene />
 
       {/* MOBILE FLOATING MENU BUTTON: Floating top-left */}
-      <button
+      <motion.button
+        animate={{
+          y: (showTopControls || messages.length === 0) ? 0 : -80,
+          opacity: (showTopControls || messages.length === 0) ? 1 : 0
+        }}
+        transition={{ type: 'spring', damping: 25, stiffness: 220 }}
         onClick={() => setIsSidebarOpen(true)}
         className="md:hidden absolute top-4 left-4 z-30 w-9 h-9 rounded-full bg-[#301A15] border border-[#4A2F29] flex items-center justify-center text-white hover:bg-[#47271F] hover:scale-105 active:scale-95 transition-all shadow-sm cursor-pointer select-none"
         title="Open Sidebar"
       >
         <Menu className="w-4 h-4 text-white" />
-      </button>
+      </motion.button>
 
       {/* FLOATING CONTROLS: Placed absolute top right for both desktop and mobile */}
-      <div className="flex absolute top-4 right-4 z-30 items-center gap-3">
+      <motion.div
+        animate={{
+          y: (showTopControls || messages.length === 0) ? 0 : -80,
+          opacity: (showTopControls || messages.length === 0) ? 1 : 0
+        }}
+        transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+        className="flex absolute top-4 right-4 z-30 items-center gap-3"
+      >
         {(authenticated || isGuestMode) && <CreditMeter />}
         {authenticated ? (
           <UserDropdownCard />
@@ -246,7 +259,7 @@ export default function WorkspacePage() {
             <LogIn className="w-4 h-4 text-white" />
           </button>
         )}
-      </div>
+      </motion.div>
 
       {/* Floating toast alerts */}
       <AnimatePresence>

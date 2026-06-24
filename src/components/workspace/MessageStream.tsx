@@ -26,6 +26,31 @@ export default function MessageStream() {
     }
   }, [messages, activeToolCalls]);
 
+  // Scroll direction detection to hide/show top controls
+  const setShowTopControls = useSessionStore((state) => state.setShowTopControls);
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let lastScrollTop = 0;
+    const handleScroll = () => {
+      const scrollTop = container.scrollTop;
+      // Scrolling down and scrolled past a tiny threshold (e.g. 50px)
+      if (scrollTop > lastScrollTop && scrollTop > 50) {
+        setShowTopControls(false);
+      } else if (scrollTop < lastScrollTop) {
+        // Scrolling up
+        setShowTopControls(true);
+      }
+      lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, [setShowTopControls]);
+
   return (
     <div
       ref={containerRef}

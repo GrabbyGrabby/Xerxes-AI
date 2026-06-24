@@ -19,12 +19,14 @@ interface SessionState {
   activeToolCalls: ToolStatus[];
   conversations: any[];
   activeConversationId: string | null;
+  showTopControls: boolean;
   
   setCredits: (credits: number) => void;
   setActiveModelId: (modelId: string) => void;
   setAvailableModels: (models: any[]) => void;
   setIsStreaming: (is: boolean) => void;
   setMessages: (messages: ChatMessage[]) => void;
+  setShowTopControls: (show: boolean) => void;
   addMessage: (message: ChatMessage) => void;
   updateLastMessageText: (text: string) => void;
   addToolCall: (toolCall: ToolStatus) => void;
@@ -45,12 +47,14 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   activeToolCalls: [],
   conversations: [],
   activeConversationId: null,
+  showTopControls: true,
 
   setCredits: (credits) => set({ credits }),
   setActiveModelId: (activeModelId) => set({ activeModelId }),
   setAvailableModels: (availableModels) => set({ availableModels }),
   setIsStreaming: (isStreaming) => set({ isStreaming }),
   setMessages: (messages) => set({ messages }),
+  setShowTopControls: (showTopControls) => set({ showTopControls }),
   
   addMessage: (message) => set((state) => ({ 
     messages: [...state.messages, message] 
