@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
       mistral: !!process.env.MISTRAL_API_KEY,
     };
 
-    const modelsWithHealth = SUPPORTED_MODELS
+    let modelsWithHealth = SUPPORTED_MODELS
       .map((m) => {
         const providerId = m.provider.toLowerCase();
         const isHealthy = health[providerId as keyof typeof health] ?? false;
@@ -45,6 +45,11 @@ export async function GET(req: NextRequest) {
         };
       })
       .filter((m) => m.is_healthy);
+
+    // Fallback: If no API keys are configured, return all models as healthy for preview/UI rendering
+    if (modelsWithHealth.length === 0) {
+      modelsWithHealth = SUPPORTED_MODELS.map((m) => ({ ...m, is_healthy: true }));
+    }
 
     return NextResponse.json({ models: modelsWithHealth });
   } catch (error: any) {
