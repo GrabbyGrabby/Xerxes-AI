@@ -144,11 +144,14 @@ export default function Composer() {
 
     try {
       const token = authenticated ? await getAccessToken() : null;
+      const isGuestMode = !authenticated && typeof window !== 'undefined' && localStorage.getItem('nexus_guest_access') === 'true';
+      const activeGuestId = isGuestMode ? guestId : null;
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-guest-id': guestId || '',
+          'x-guest-id': activeGuestId || '',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
@@ -156,6 +159,7 @@ export default function Composer() {
           modelId: activeModelId,
           images: imageCids,
           currentCredits: useSessionStore.getState().credits,
+          conversationId: useSessionStore.getState().activeConversationId,
         }),
       });
 
@@ -214,6 +218,11 @@ export default function Composer() {
               });
             } else if (eventType === 'usage') {
               setCredits(data.newBalance);
+            } else if (eventType === 'conversation_id') {
+              useSessionStore.getState().setActiveConversationId(data.conversationId);
+              if (typeof window !== 'undefined' && (window as any).refreshConversations) {
+                (window as any).refreshConversations();
+              }
             } else if (eventType === 'error') {
               updateLastMessageText(`\n\n[Error: ${data.message}]`);
             }
@@ -241,11 +250,11 @@ export default function Composer() {
     <div className="w-full">
       {/* File upload status bar */}
       {uploadStatus && (
-        <div className="mb-2.5 p-3 rounded-2xl border border-[#EFE0D4] bg-[#F7EAE1] text-xs flex items-center justify-between text-[#301A15]/70">
+        <div className="mb-2.5 p-3 rounded-2xl border border-white/10 bg-[#1F110E] text-xs flex items-center justify-between text-white/70">
           <div className="flex items-center gap-2">
             <Loader2 className="w-3.5 h-3.5 text-[#D35E43] animate-spin" />
             <span className="truncate max-w-[200px]">Uploading <strong>{uploadStatus.filename}</strong></span>
-            <span className="text-[10px] text-[#7E6C68] font-semibold uppercase tracking-wider font-mono">
+            <span className="text-[10px] text-white/50 font-semibold uppercase tracking-wider font-mono">
               ({uploadStatus.progress.replace('_', ' ')})
             </span>
           </div>
@@ -261,10 +270,10 @@ export default function Composer() {
           {attachments.map((file, i) => (
             <div
               key={i}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#EFE0D4] bg-[#F7EAE1]/30 text-xs text-[#301A15]/80"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-[#301A15] text-xs text-white"
             >
               {file.mimeType.startsWith('image/') ? (
-                <ImageIcon className="w-3.5 h-3.5 text-blue-500" />
+                <ImageIcon className="w-3.5 h-3.5 text-blue-400" />
               ) : (
                 <FileText className="w-3.5 h-3.5 text-[#D35E43]" />
               )}
@@ -281,8 +290,8 @@ export default function Composer() {
         </div>
       )}
 
-      {/* Milky Card Composer */}
-      <form onSubmit={handleSend} className="bg-white border border-[#EFE0D4] rounded-[32px] p-3.5 relative shadow-[0_12px_40px_-8px_rgba(48,26,21,0.06)] hover:border-[#D35E43]/40 transition-colors duration-500">
+      {/* Premium Dark Composer Card */}
+      <form onSubmit={handleSend} className="bg-[#1F110E] border border-[#4A2F29] rounded-[32px] p-3.5 relative shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:border-[#D35E43]/40 transition-colors duration-500">
         <textarea
           ref={textareaRef}
           value={input}
@@ -291,18 +300,18 @@ export default function Composer() {
           placeholder="Ask models anything..."
           rows={1}
           disabled={isStreaming}
-          className="w-full bg-transparent border-0 text-sm text-[#301A15] placeholder-[#7E6C68]/50 focus:ring-0 focus:outline-none resize-none px-3.5 py-3 pr-14 leading-relaxed font-sans max-h-48 inside-text"
+          className="w-full bg-transparent border-0 text-sm text-white placeholder-[#8C746E] focus:ring-0 focus:outline-none resize-none px-3.5 py-3 pr-14 leading-relaxed font-sans max-h-48 inside-text"
         />
 
         {/* Toolbar Row */}
-        <div className="flex items-center justify-between border-t border-[#FDF6F0] pt-3 px-1 mt-2">
+        <div className="flex items-center justify-between border-t border-[#4A2F29] pt-3 px-1 mt-2">
           <div className="flex items-center gap-2">
-            {/* Paperclip Button - Switches to black background with white icon on hover */}
+            {/* Paperclip Button */}
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={isStreaming}
-              className="p-2.5 rounded-full border border-[#EFE0D4] bg-white text-[#301A15] hover:bg-black hover:text-white hover:border-black transition-all duration-300 cursor-pointer disabled:opacity-50"
+              className="p-2.5 rounded-full border border-[#4A2F29] bg-[#301A15] text-white hover:bg-white hover:text-black hover:border-white transition-all duration-300 cursor-pointer disabled:opacity-50"
             >
               <Paperclip className="w-4 h-4" />
             </button>
@@ -317,16 +326,16 @@ export default function Composer() {
             <ModelPicker />
           </div>
 
-          {/* Dark brown rounded send button */}
+          {/* Terracotta/White Send Button */}
           <button
             type="submit"
             disabled={(!input.trim() && attachments.length === 0) || isStreaming}
-            className="p-2.5 bg-[#301A15] hover:bg-black disabled:bg-[#FDF6F0] disabled:text-[#7E6C68]/30 active:scale-95 text-white rounded-full transition-all shadow-[0_4px_12px_rgba(48,26,21,0.25)] disabled:shadow-none cursor-pointer"
+            className="p-2.5 bg-white hover:bg-white/90 disabled:bg-[#301A15] disabled:text-white/20 active:scale-95 text-[#1F110E] rounded-full transition-all shadow-sm cursor-pointer"
           >
             {isStreaming ? (
-              <Loader2 className="w-4 h-4 animate-spin text-white" />
+              <Loader2 className="w-4 h-4 animate-spin text-[#1F110E]" />
             ) : (
-              <ArrowUp className="w-4 h-4 text-white" />
+              <ArrowUp className="w-4 h-4 text-[#1F110E]" />
             )}
           </button>
         </div>

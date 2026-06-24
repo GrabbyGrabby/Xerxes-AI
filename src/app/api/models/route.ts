@@ -14,9 +14,9 @@ const SUPPORTED_MODELS = [
   { id: 'gemini-1.5-pro', provider: 'gemini', display_name: 'Gemini 1.5 Pro', description: 'Solid reasoning capabilities', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: true, supports_tools: true, is_active: true },
   { id: 'gemini-1.5-flash', provider: 'gemini', display_name: 'Gemini 1.5 Flash', description: 'Quick responses', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: true, supports_tools: true, is_active: true },
 
-  // OpenRouter (Free)
-  { id: 'deepseek/deepseek-r1:free', provider: 'openrouter', display_name: 'DeepSeek R1 (OpenRouter Free)', description: 'OpenRouter free reasoning endpoint', category: 'reasoning', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: false, supports_tools: false, is_active: true },
-  { id: 'google/gemini-2.0-flash-exp:free', provider: 'openrouter', display_name: 'Gemini 2.0 Flash (OpenRouter Free)', description: 'Google Gemini via OpenRouter', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: true, supports_tools: true, is_active: true },
+  // OpenRouter (Free/Standard)
+  { id: 'deepseek/deepseek-r1', provider: 'openrouter', display_name: 'DeepSeek R1 (OpenRouter)', description: 'State-of-the-art reasoning model', category: 'reasoning', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: false, supports_tools: false, is_active: true },
+  { id: 'google/gemini-2.0-flash', provider: 'openrouter', display_name: 'Gemini 2.0 Flash (OpenRouter)', description: 'Google Gemini via OpenRouter', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: true, supports_tools: true, is_active: true },
   { id: 'meta-llama/llama-3.3-70b-instruct:free', provider: 'openrouter', display_name: 'Llama 3.3 70B (OpenRouter Free)', description: 'Powerful Meta LLM', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: false, supports_tools: true, is_active: true },
 
   // Mistral AI

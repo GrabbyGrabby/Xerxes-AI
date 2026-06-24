@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useMemo, useState, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -21,12 +21,12 @@ function RotatingChromeSphere() {
   });
 
   return (
-    <mesh ref={sphereRef} position={[2.8, 0, -1]} scale={2.5}>
+    <mesh ref={sphereRef} position={[1.3, 0.1, -1]} scale={0.6}>
       <sphereGeometry args={[1, 128, 128]} />
-      {/* High reflectivity metallic grey mirror */}
+      {/* High reflectivity metallic black sphere */}
       <meshPhysicalMaterial
-        color="#888899"
-        roughness={0.0}
+        color="#111111"
+        roughness={0.05}
         metalness={1.0}
         clearcoat={1.0}
         clearcoatRoughness={0.0}
@@ -98,29 +98,34 @@ function ParticleField() {
   );
 }
 
-export default function AmbientScene() {
+interface AmbientSceneProps {
+  bgType?: 'login' | 'workspace';
+}
+
+export default function AmbientScene({ bgType = 'workspace' }: AmbientSceneProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  const bgHex = bgType === 'login' ? '#FAF9F6' : '#B5CBB7';
+
   if (!mounted) {
-    return <div className="absolute inset-0 bg-[#FAF1EB] z-[-2]" />;
+    return <div className="absolute inset-0 z-[-2]" style={{ backgroundColor: bgHex }} />;
   }
 
   return (
-    // Set background color to the soft Yupp peach/beige
-    <div className="absolute inset-0 z-[-2] overflow-hidden pointer-events-none select-none bg-[#FAF1EB]">
-      {/* Light warm sunbeam gradient overlays */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_40%,rgba(255,255,255,0.4),transparent_50%),radial-gradient(circle_at_20%_80%,rgba(247,234,225,0.2),transparent_50%)]" />
+    <div className="absolute inset-0 z-[-2] overflow-hidden pointer-events-none select-none" style={{ backgroundColor: bgHex }}>
+      {/* Light warm sunbeam overlays (subdued for milky/pista green) */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_40%,rgba(255,255,255,0.25),transparent_50%),radial-gradient(circle_at_20%_80%,rgba(255,255,255,0.1),transparent_50%)]" />
       
       <Canvas
         camera={{ position: [0, 0, 8], fov: 60 }}
         gl={{ alpha: true, antialias: true }}
       >
         <ambientLight intensity={0.6} />
-        {/* Powerful lights to create crisp reflections on the chrome sphere */}
+        {/* Powerful lights to create reflections on the metallic sphere */}
         <directionalLight position={[5, 5, 4]} intensity={2.8} color="#ffffff" />
         <directionalLight position={[-5, 3, -2]} intensity={1.0} color="#e5e5e5" />
         <pointLight position={[0, -4, 2]} intensity={0.5} />

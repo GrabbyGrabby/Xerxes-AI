@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
   // 3. Resolve Model configuration statically (database query bypassed to avoid openzen fallback errors)
   const SUPPORTED_MODELS = [
     // NVIDIA NIM
-    { id: 'minimaxai/minimax-m3', provider: 'nvidia', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
+    { id: 'minimaxai/minimax-m3', provider: 'nvidia', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: false },
     { id: 'deepseek-ai/deepseek-v4-flash', provider: 'nvidia', category: 'reasoning', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
     
     // Gemini
@@ -146,9 +146,9 @@ export async function POST(req: NextRequest) {
     { id: 'gemini-1.5-pro', provider: 'gemini', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
     { id: 'gemini-1.5-flash', provider: 'gemini', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
 
-    // OpenRouter (Free)
-    { id: 'deepseek/deepseek-r1:free', provider: 'openrouter', category: 'reasoning', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: false },
-    { id: 'google/gemini-2.0-flash-exp:free', provider: 'openrouter', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
+    // OpenRouter (Free/Standard)
+    { id: 'deepseek/deepseek-r1', provider: 'openrouter', category: 'reasoning', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: false },
+    { id: 'google/gemini-2.0-flash', provider: 'openrouter', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
     { id: 'meta-llama/llama-3.3-70b-instruct:free', provider: 'openrouter', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
 
     // Mistral AI
@@ -253,6 +253,55 @@ export async function POST(req: NextRequest) {
       };
 
       try {
+        let currentConversationId = conversationId;
+        
+        // Auto-create conversation if new thread
+        if (!currentConversationId && isSupabaseConfigured) {
+          try {
+            const firstUserMsg = messages.find((m: any) => m.role === 'user')?.content || 'New Chat';
+            const title = firstUserMsg.slice(0, 35) + (firstUserMsg.length > 35 ? '...' : '');
+            
+            const { data: newConv, error: newConvErr } = await supabaseServer
+              .from('conversations')
+              .insert({
+                user_id: session.userId || null,
+                guest_id: session.guestId || null,
+                title: title,
+              })
+              .select('*')
+              .single();
+
+            if (!newConvErr && newConv) {
+              currentConversationId = newConv.id;
+            }
+          } catch (dbErr) {
+            console.error('Failed to create database conversation:', dbErr);
+          }
+        }
+
+        // Always yield the active conversation ID immediately
+        if (currentConversationId) {
+          sendSSE('conversation_id', { conversationId: currentConversationId });
+        }
+
+        // Save incoming user message to database
+        if (currentConversationId && isSupabaseConfigured) {
+          try {
+            const lastUserMsg = messages[messages.length - 1];
+            if (lastUserMsg && lastUserMsg.role === 'user') {
+              await supabaseServer
+                .from('messages')
+                .insert({
+                  conversation_id: currentConversationId,
+                  role: 'user',
+                  content: lastUserMsg.content,
+                });
+            }
+          } catch (dbErr) {
+            console.error('Failed to save user message to database:', dbErr);
+          }
+        }
+
         let history = [...messages];
         let toolLoopCount = 0;
         const maxToolSteps = 5;
@@ -366,6 +415,23 @@ export async function POST(req: NextRequest) {
 
         // 5. Calculate Final Credits Spent (1 credit = 1 message)
         totalOutputTokens = enc.encode(accumulatedText).length;
+
+        // Save assistant message to database
+        if (currentConversationId && isSupabaseConfigured && accumulatedText) {
+          try {
+            await supabaseServer
+              .from('messages')
+              .insert({
+                conversation_id: currentConversationId,
+                role: 'assistant',
+                content: accumulatedText,
+                model_id: modelId,
+              });
+          } catch (dbErr) {
+            console.error('Failed to save assistant message:', dbErr);
+          }
+        }
+
         const finalCost = 1;
         const finalBalance = balance - finalCost;
 

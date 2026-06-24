@@ -1,22 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #FAF1EB;
-  --color-foreground: #301A15;
+  --color-background: #B5CBB7; /* Sage / Pista Green */
+  --color-foreground: #1F110E; /* Dark Chocolate Brown */
   
-  --color-card: #FFFFFF;
-  --color-card-foreground: #301A15;
+  --color-card: #1F110E; /* Dark Brown */
+  --color-card-foreground: #FAF1EB;
   
-  --color-popover: #FFFDFB;
-  --color-popover-foreground: #301A15;
+  --color-popover: #1F110E;
+  --color-popover-foreground: #FAF1EB;
   
-  --color-primary: #301A15; /* Deep Chocolate Brown */
-  --color-primary-foreground: #FFFFFF;
+  --color-primary: #1F110E;
+  --color-primary-foreground: #FAF1EB;
   
-  --color-secondary: #F5EAE1; /* Warm Yupp Beige */
-  --color-secondary-foreground: #301A15;
+  --color-secondary: #301A15;
+  --color-secondary-foreground: #FAF1EB;
   
-  --color-muted: #EFE0D4;
+  --color-muted: #301A15;
   --color-muted-foreground: #7E6C68;
   
   --color-accent: #D35E43; /* Terracotta / Coral Orange */
@@ -25,8 +25,8 @@
   --color-destructive: #B54A4A;
   --color-destructive-foreground: #FFFFFF;
   
-  --color-border: #EFE0D4;
-  --color-input: #FFFFFF;
+  --color-border: #2C1813;
+  --color-input: #1F110E;
   --color-ring: #D35E43;
 
   --font-sans: var(--font-poppins), sans-serif;
@@ -48,22 +48,26 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #EFE0D4;
+  background: #301A15;
   border-radius: 9999px;
-  border: 2px solid #FAF1EB;
+  border: 2px solid #B5CBB7;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #D5C4B8;
+  background: #47271F;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
+* {
+  font-family: var(--font-poppins), sans-serif;
+}
+
 body {
-  background-color: #FAF1EB;
-  color: #301A15;
+  background-color: #B5CBB7;
+  color: #1F110E;
   font-family: var(--font-poppins), sans-serif;
   font-weight: 400;
   overflow-x: hidden;
@@ -71,17 +75,17 @@ body {
 
 /* Header font styled in Copperplate Gothic */
 h1, h2, h3, h4, h5, h6, .font-header {
-  font-family: 'Copperplate Gothic', 'Copperplate', 'Copperplate Gothic Bold', 'Copperplate Gothic Light', fantasy, sans-serif;
+  font-family: 'Copperplate Gothic', 'Copperplate', 'Copperplate Gothic Bold', 'Copperplate Gothic Light', fantasy, sans-serif !important;
   letter-spacing: normal;
 }
 
 /* Milky Glassmorphic panels */
 .milky-card {
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(31, 17, 14, 0.75);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 16px 40px -10px rgba(28, 43, 40, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.4);
 }
 
 .milky-card-hover {
@@ -89,30 +93,29 @@ h1, h2, h3, h4, h5, h6, .font-header {
 }
 
 .milky-card-hover:hover {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(45, 62, 59, 0.2);
-  box-shadow: 0 24px 48px -12px rgba(45, 62, 59, 0.12);
+  background: rgba(31, 17, 14, 0.95);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
   transform: translateY(-4px);
 }
 
 /* Small tags/pills transition: white to black on hover */
 .hover-pill-tag {
-  background-color: rgba(255, 255, 255, 0.9);
-  color: #1C2B28;
-  border: 1px solid #A4B6AB;
+  background-color: rgba(48, 26, 21, 0.9);
+  color: #FAF1EB;
+  border: 1px solid #2C1813;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hover-pill-tag:hover {
-  background-color: #1C2B28;
-  color: #FFFFFF;
-  border-color: #1C2B28;
+  background-color: #FAF1EB;
+  color: #1F110E;
+  border-color: #FAF1EB;
 }
 
-/* Ensure inside text has no bold weights and uses Poppins */
+/* Ensure inside text uses Poppins font family */
 .inside-text, .inside-text * {
   font-family: var(--font-poppins), sans-serif !important;
-  font-weight: 400 !important;
 }
 
 /* Tiny scrollbar for dropdowns */
@@ -124,13 +127,13 @@ h1, h2, h3, h4, h5, h6, .font-header {
   background: transparent;
 }
 .tiny-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 9999px;
 }
 .tiny-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.2);
 }
 .tiny-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }

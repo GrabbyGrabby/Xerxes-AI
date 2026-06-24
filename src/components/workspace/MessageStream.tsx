@@ -43,9 +43,9 @@ export default function MessageStream() {
             initial={{ scale: 0.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="w-32 h-32 mb-2 bg-transparent shrink-0"
+            className="w-28 h-28 mb-2 bg-transparent shrink-0"
           >
-            <img src="/logo.png" alt="Xerxes AI Logo" className="w-full h-full object-contain" />
+            <img src="/logo.png" alt="Xerxes AI Logo" className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(255,255,255,0.18)]" />
           </motion.div>
 
           {/* Xerxes AI Bold Copperplate gothic */}
@@ -54,7 +54,7 @@ export default function MessageStream() {
             initial={{ scale: 0.8, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="font-header text-5xl md:text-7xl font-bold text-[#301A15] tracking-wide leading-none drop-shadow-2xl shadow-black/10"
+            className="font-header text-5xl md:text-7xl font-bold text-[#1F110E] tracking-wide leading-none drop-shadow-2xl shadow-black/10"
           >
             Xerxes AI
           </motion.h2>
@@ -64,7 +64,7 @@ export default function MessageStream() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="font-header text-sm md:text-lg font-light text-[#7E6C68] tracking-widest mt-1"
+            className="font-header text-sm md:text-lg font-light text-[#5C4D4A] tracking-widest mt-1"
           >
             One Agent , Your All Worklows !
           </motion.p>
@@ -100,16 +100,14 @@ export default function MessageStream() {
                       {isUser ? (user?.email?.address || 'User') : 'Xerxes'}
                     </span>
 
-                    {/* Chat Bubble - Yupp theme */}
+                    {/* Chat Bubble - Consistent light beige theme */}
                     <div
-                      className={`rounded-[24px] text-xs leading-relaxed border shadow-[0_4px_16px_rgba(48,26,21,0.03)] inside-text ${
+                      className={`rounded-[24px] text-xs leading-relaxed border border-[#EFE0D4] bg-[#F5EAE1] text-[#301A15] shadow-[0_4px_16px_rgba(0,0,0,0.25)] inside-text ${
                         msg.content === '' && isLast && isStreaming && activeToolCalls.length === 0
                           ? 'px-3 py-1.5'
                           : 'px-4.5 py-3.5'
                       } ${
-                        isUser
-                          ? 'border-[#EFE0D4] bg-[#F5EAE1] text-[#301A15] rounded-tr-sm font-normal'
-                          : 'border-[#2C1813] bg-[#301A15] text-white rounded-tl-sm'
+                        isUser ? 'rounded-tr-sm font-normal' : 'rounded-tl-sm font-medium'
                       }`}
                     >
                       <div className="whitespace-pre-wrap break-words space-y-3 font-sans">
@@ -117,7 +115,7 @@ export default function MessageStream() {
                           // Small black chrome loader sphere next to text indicator
                           <div className="flex items-center gap-2 py-1.5">
                             <XerxesSphere size="small" />
-                            <span className={`text-[11px] font-bold font-mono animate-pulse ${isUser ? 'text-[#301A15]' : 'text-white'}`}>
+                            <span className="text-[11px] font-bold font-mono animate-pulse text-[#301A15]">
                               Thinking...
                             </span>
                           </div>
@@ -204,7 +202,7 @@ function formatContent(text: string, isUser: boolean) {
           {inlineParts.map((subPart, subIdx) => {
             if (subPart.startsWith('**') && subPart.endsWith('**')) {
               return (
-                <strong key={subIdx} className={`font-normal ${isUser ? 'text-[#301A15]' : 'text-white'}`}>
+                <strong key={subIdx} className="font-normal text-[#301A15]">
                   {subPart.slice(2, -2)}
                 </strong>
               );
