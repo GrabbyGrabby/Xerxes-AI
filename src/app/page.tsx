@@ -475,7 +475,7 @@ export default function WorkspacePage() {
                 className="font-header text-[9px] md:text-[10px] font-light text-[#FAF1EB]/60 tracking-widest mt-0.5"
                 transition={{ type: 'spring', damping: 25, stiffness: 220 }}
               >
-                One Agent , Your All Worklows !
+                One Agent , Your All Workflows !
               </motion.p>
             </motion.div>
           )}

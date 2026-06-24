@@ -83,7 +83,7 @@ export default function MessageStream() {
           >
             Xerxes AI
           </motion.h2>
-          {/* One Agent , Your All Worklows thin Copperplate gothic */}
+          {/* One Agent , Your All Workflows thin Copperplate gothic */}
           <motion.p 
             layoutId="xerxes-subtitle"
             initial={{ opacity: 0 }}
@@ -91,7 +91,7 @@ export default function MessageStream() {
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
             className="font-header text-sm md:text-lg font-light text-[#FAF1EB]/50 tracking-widest mt-1"
           >
-            One Agent , Your All Worklows !
+            One Agent , Your All Workflows !
           </motion.p>
         </motion.div>
       ) : (
