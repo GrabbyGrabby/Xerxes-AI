@@ -51,7 +51,7 @@ export default function CreditMeter() {
           setIsOpen(!isOpen);
           if (!isOpen) fetchCreditsData();
         }}
-        className="flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#1F110E]/15 bg-[oklch(71.4%_0.014_41.2)] hover:bg-[oklch(71.4%_0.014_41.2)]/90 transition-all text-xs text-[#1F110E] shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer select-none font-sans font-bold"
+        className="flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#1F110E]/15 bg-[oklch(90.1%_0.076_70.697)] hover:bg-[oklch(90.1%_0.076_70.697)]/90 transition-all text-xs text-[#1F110E] shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer select-none font-sans font-bold"
       >
         <span className="text-[#1F110E]/60 font-semibold text-[10px] tracking-tight uppercase">Credits:</span>
         <span className="font-header font-black text-xs text-[#1F110E] tracking-tight">{credits}</span>

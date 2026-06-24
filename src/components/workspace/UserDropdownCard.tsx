@@ -30,7 +30,7 @@ export default function UserDropdownCard() {
       {/* Inverted pista green trigger button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#1F110E]/15 bg-[oklch(71.4%_0.014_41.2)] hover:bg-[oklch(71.4%_0.014_41.2)]/90 transition-all text-xs text-[#1F110E] shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer select-none font-bold"
+        className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#1F110E]/15 bg-[oklch(90.1%_0.076_70.697)] hover:bg-[oklch(90.1%_0.076_70.697)]/90 transition-all text-xs text-[#1F110E] shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer select-none font-bold"
       >
         <div className="w-5 h-5 rounded-full bg-[#1F110E]/10 border border-[#1F110E]/15 flex items-center justify-center shrink-0">
           <User className="w-3 h-3 text-[#1F110E]" />
