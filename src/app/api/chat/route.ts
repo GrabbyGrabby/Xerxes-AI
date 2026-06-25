@@ -255,27 +255,47 @@ export async function POST(req: NextRequest) {
       try {
         let currentConversationId = conversationId;
         
-        // Auto-create conversation if new thread
-        if (!currentConversationId && isSupabaseConfigured) {
+        // Auto-create or ensure conversation exists in database
+        if (isSupabaseConfigured) {
           try {
             const firstUserMsg = messages.find((m: any) => m.role === 'user')?.content || 'New Chat';
             const title = firstUserMsg.slice(0, 35) + (firstUserMsg.length > 35 ? '...' : '');
-            
-            const { data: newConv, error: newConvErr } = await supabaseServer
-              .from('conversations')
-              .insert({
-                user_id: session.userId || null,
-                guest_id: session.guestId || null,
-                title: title,
-              })
-              .select('*')
-              .single();
 
-            if (!newConvErr && newConv) {
-              currentConversationId = newConv.id;
+            if (!currentConversationId) {
+              const { data: newConv, error: newConvErr } = await supabaseServer
+                .from('conversations')
+                .insert({
+                  user_id: session.userId || null,
+                  guest_id: session.guestId || null,
+                  title: title,
+                })
+                .select('*')
+                .single();
+
+              if (!newConvErr && newConv) {
+                currentConversationId = newConv.id;
+              }
+            } else {
+              // Ensure conversation exists in DB since client generates local UUIDs first
+              const { data: existingConv } = await supabaseServer
+                .from('conversations')
+                .select('id')
+                .eq('id', currentConversationId)
+                .single();
+
+              if (!existingConv) {
+                await supabaseServer
+                  .from('conversations')
+                  .insert({
+                    id: currentConversationId,
+                    user_id: session.userId || null,
+                    guest_id: session.guestId || null,
+                    title: title,
+                  });
+              }
             }
           } catch (dbErr) {
-            console.error('Failed to create database conversation:', dbErr);
+            console.error('Failed to ensure database conversation:', dbErr);
           }
         }
 

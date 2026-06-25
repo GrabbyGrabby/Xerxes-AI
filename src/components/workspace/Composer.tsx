@@ -7,7 +7,7 @@ import { Paperclip, ArrowUp, Loader2, Image as ImageIcon, FileText, X } from 'lu
 import ModelPicker from './ModelPicker';
 
 export default function Composer() {
-  const { authenticated, getAccessToken } = usePrivy();
+  const { authenticated, getAccessToken, user } = usePrivy();
   const guestId = useSessionStore((state) => state.guestId);
   const activeModelId = useSessionStore((state) => state.activeModelId);
   
@@ -132,6 +132,46 @@ export default function Composer() {
     setInput('');
     setAttachments([]);
     clearToolCalls();
+
+    let activeConversationId = useSessionStore.getState().activeConversationId;
+    const isNewThread = !activeConversationId;
+    const guestId = useSessionStore.getState().guestId;
+    const userId = authenticated && user ? user.id : null;
+
+    // 1. Generate local UUID for new conversation instantly (local-first)
+    if (isNewThread) {
+      activeConversationId = crypto.randomUUID();
+      useSessionStore.getState().setActiveConversationId(activeConversationId);
+      
+      try {
+        const { localDb } = await import('@/lib/storage/indexedDbHelper');
+        const title = userMessageContent.slice(0, 35) + (userMessageContent.length > 35 ? '...' : '');
+        await localDb.saveConversation({
+          id: activeConversationId,
+          title: title,
+          created_at: new Date().toISOString(),
+          user_id: userId,
+          guest_id: guestId,
+        });
+        // Refresh local threads list in sidebar
+        await useSessionStore.getState().loadConversationsFromLocal(guestId, userId);
+      } catch (err) {
+        console.error('Failed to pre-save local conversation:', err);
+      }
+    }
+
+    // 2. Save user message locally in IndexedDB
+    try {
+      const { localDb } = await import('@/lib/storage/indexedDbHelper');
+      await localDb.saveMessage({
+        conversation_id: activeConversationId!,
+        role: 'user',
+        content: userMessageContent,
+        created_at: new Date().toISOString(),
+      });
+    } catch (err) {
+      console.error('Failed to save user message locally:', err);
+    }
     
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
@@ -159,7 +199,7 @@ export default function Composer() {
           modelId: activeModelId,
           images: imageCids,
           currentCredits: useSessionStore.getState().credits,
-          conversationId: useSessionStore.getState().activeConversationId,
+          conversationId: activeConversationId,
         }),
       });
 
@@ -219,7 +259,10 @@ export default function Composer() {
             } else if (eventType === 'usage') {
               setCredits(data.newBalance);
             } else if (eventType === 'conversation_id') {
-              useSessionStore.getState().setActiveConversationId(data.conversationId);
+              // Only update if it changes (though it should match the client-generated ID we sent)
+              if (data.conversationId !== activeConversationId) {
+                useSessionStore.getState().setActiveConversationId(data.conversationId);
+              }
               if (typeof window !== 'undefined' && (window as any).refreshConversations) {
                 (window as any).refreshConversations();
               }
@@ -236,6 +279,23 @@ export default function Composer() {
       updateLastMessageText(`\n\n[Error: ${err.message || 'Connection failed'}]`);
     } finally {
       setIsStreaming(false);
+
+      // 3. Save assistant message to IndexedDB (even if it failed mid-way, so context is not lost)
+      const finalMessages = useSessionStore.getState().messages;
+      const assistantMessage = finalMessages[finalMessages.length - 1];
+      if (assistantMessage && assistantMessage.role === 'assistant') {
+        try {
+          const { localDb } = await import('@/lib/storage/indexedDbHelper');
+          await localDb.saveMessage({
+            conversation_id: activeConversationId!,
+            role: 'assistant',
+            content: assistantMessage.content,
+            created_at: new Date().toISOString(),
+          });
+        } catch (localErr) {
+          console.error('Failed to save assistant message locally in finally:', localErr);
+        }
+      }
     }
   };
 

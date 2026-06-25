@@ -29,6 +29,9 @@ export default function WorkspacePage() {
   const setActiveConversationId = useSessionStore((state) => state.setActiveConversationId);
   const showTopControls = useSessionStore((state) => state.showTopControls);
 
+  const loadConversationsFromLocal = useSessionStore((state) => state.loadConversationsFromLocal);
+  const syncConversationsWithBackend = useSessionStore((state) => state.syncConversationsWithBackend);
+
   // Custom UI helper states
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -89,6 +92,11 @@ export default function WorkspacePage() {
 
   // Fetch recent conversation history
   const fetchConversationsList = async () => {
+    const userId = user?.id || null;
+    
+    // Load from local DB first (instant, offline-ready)
+    await loadConversationsFromLocal(guestId, userId);
+
     try {
       const token = authenticated ? await getAccessToken() : null;
       const headers: Record<string, string> = {};
@@ -98,10 +106,11 @@ export default function WorkspacePage() {
       const res = await fetch('/api/conversations', { headers });
       if (res.ok) {
         const data = await res.json();
-        setConversations(data.conversations || []);
+        // Sync API list to IndexedDB
+        await syncConversationsWithBackend(data.conversations || [], guestId, userId);
       }
     } catch (e) {
-      console.error('Error fetching conversations list:', e);
+      console.error('Error fetching conversations list, using local storage cache:', e);
     }
   };
 
@@ -125,6 +134,16 @@ export default function WorkspacePage() {
 
   const loadConversation = async (id: string) => {
     try {
+      // 1. Try loading from local IndexedDB first
+      const { localDb } = await import('@/lib/storage/indexedDbHelper');
+      const localMsgs = await localDb.getMessages(id);
+      if (localMsgs.length > 0) {
+        setMessages(localMsgs as any);
+        setActiveConversationId(id);
+        setIsSidebarOpen(false);
+      }
+
+      // 2. Fetch from backend API to sync in the background
       const token = authenticated ? await getAccessToken() : null;
       const headers: Record<string, string> = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -133,16 +152,30 @@ export default function WorkspacePage() {
       const res = await fetch(`/api/conversations?id=${id}`, { headers });
       if (res.ok) {
         const data = await res.json();
-        setMessages(data.messages || []);
+        const serverMsgs = data.messages || [];
+        setMessages(serverMsgs);
         setActiveConversationId(id);
         setIsSidebarOpen(false);
-        triggerToast('Loaded thread history.');
+        if (localMsgs.length > 0) {
+          triggerToast('Synced thread history.');
+        } else {
+          triggerToast('Loaded thread history.');
+        }
+        // Save server messages back to local database
+        await localDb.bulkSaveMessages(id, serverMsgs);
       } else {
-        triggerToast('Failed to load conversation.');
+        if (localMsgs.length === 0) {
+          triggerToast('Failed to load conversation.');
+        }
       }
     } catch (e) {
-      console.error(e);
-      triggerToast('Error loading conversation.');
+      console.error('Error loading conversation:', e);
+      // If we failed but loaded locally, don't show full error toast
+      const { localDb } = await import('@/lib/storage/indexedDbHelper');
+      const localMsgs = await localDb.getMessages(id);
+      if (localMsgs.length === 0) {
+        triggerToast('Error loading conversation.');
+      }
     }
   };
 
@@ -161,6 +194,21 @@ export default function WorkspacePage() {
 
   const handleRename = async (id: string, newTitle: string) => {
     if (!newTitle.trim()) return;
+    const userId = user?.id || null;
+
+    // Update locally first (optimistic UI)
+    try {
+      const { localDb } = await import('@/lib/storage/indexedDbHelper');
+      const conv = await localDb.getConversation(id);
+      if (conv) {
+        conv.title = newTitle.trim();
+        await localDb.saveConversation(conv);
+      }
+      await loadConversationsFromLocal(guestId, userId);
+    } catch (localErr) {
+      console.error('Failed to rename locally:', localErr);
+    }
+
     try {
       const res = await fetch('/api/conversations', {
         method: 'PATCH',
@@ -172,15 +220,32 @@ export default function WorkspacePage() {
         setRenamingId(null);
         fetchConversationsList();
       } else {
-        triggerToast('Failed to rename thread.');
+        triggerToast('Renamed locally. Cloud sync pending.');
+        setRenamingId(null);
       }
     } catch (e) {
       console.error(e);
-      triggerToast('Error renaming thread.');
+      triggerToast('Renamed locally (offline).');
+      setRenamingId(null);
     }
   };
 
   const handleDelete = async (id: string) => {
+    const userId = user?.id || null;
+
+    // Delete locally first (optimistic UI)
+    try {
+      const { localDb } = await import('@/lib/storage/indexedDbHelper');
+      await localDb.deleteConversation(id);
+      await loadConversationsFromLocal(guestId, userId);
+      if (activeConversationId === id) {
+        setMessages([]);
+        setActiveConversationId(null);
+      }
+    } catch (localErr) {
+      console.error('Failed to delete locally:', localErr);
+    }
+
     try {
       const res = await fetch(`/api/conversations?id=${id}`, {
         method: 'DELETE',
@@ -188,17 +253,15 @@ export default function WorkspacePage() {
       if (res.ok) {
         triggerToast('Thread deleted.');
         setDeletingId(null);
-        if (activeConversationId === id) {
-          setMessages([]);
-          setActiveConversationId(null);
-        }
         fetchConversationsList();
       } else {
-        triggerToast('Failed to delete thread.');
+        triggerToast('Deleted locally. Cloud sync failed.');
+        setDeletingId(null);
       }
     } catch (e) {
       console.error(e);
-      triggerToast('Error deleting thread.');
+      triggerToast('Deleted locally (offline).');
+      setDeletingId(null);
     }
   };
 
@@ -591,9 +654,17 @@ export default function WorkspacePage() {
             <motion.div
               layoutId="xerxes-header-container"
               className="flex flex-col items-center justify-center pb-0 mb-2 select-none shrink-0"
-              transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+              initial={{ scale: 0.85, y: -12, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              whileHover={{ 
+                scale: 1.05, 
+                y: -1,
+                transition: { type: "spring", stiffness: 450, damping: 12 }
+              }}
+              style={{ originY: 0.5 }}
+              transition={{ type: 'spring', damping: 20, stiffness: 300 }}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 cursor-pointer filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)] hover:drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)] transition-all duration-300">
                 <motion.div
                   layoutId="xerxes-logo-image"
                   className="w-8 h-8 bg-transparent shrink-0"

@@ -35,6 +35,10 @@ interface SessionState {
   setConversations: (convs: any[]) => void;
   setActiveConversationId: (id: string | null) => void;
   initGuestSession: () => string;
+  loadConversationsFromLocal: (guestId: string | null, userId: string | null) => Promise<void>;
+  saveLocalConversation: (id: string, title: string, guestId: string | null, userId: string | null) => Promise<void>;
+  saveLocalMessage: (conversationId: string, message: ChatMessage) => Promise<void>;
+  syncConversationsWithBackend: (apiList: any[], guestId: string | null, userId: string | null) => Promise<void>;
 }
 
 export const useSessionStore = create<SessionState>((set, get) => ({
@@ -95,4 +99,72 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     set({ guestId: id });
     return id;
   },
+
+  loadConversationsFromLocal: async (guestId, userId) => {
+    if (typeof window === 'undefined') return;
+    try {
+      const { localDb } = await import('@/lib/storage/indexedDbHelper');
+      const localConvs = await localDb.getAllConversations(guestId, userId);
+      set({ conversations: localConvs });
+    } catch (e) {
+      console.error('Error in loadConversationsFromLocal:', e);
+    }
+  },
+
+  saveLocalConversation: async (id, title, guestId, userId) => {
+    if (typeof window === 'undefined') return;
+    try {
+      const { localDb } = await import('@/lib/storage/indexedDbHelper');
+      await localDb.saveConversation({
+        id,
+        title,
+        created_at: new Date().toISOString(),
+        user_id: userId,
+        guest_id: guestId,
+      });
+      // Refresh state from DB
+      const localConvs = await localDb.getAllConversations(guestId, userId);
+      set({ conversations: localConvs });
+    } catch (e) {
+      console.error('Error in saveLocalConversation:', e);
+    }
+  },
+
+  saveLocalMessage: async (conversationId, message) => {
+    if (typeof window === 'undefined') return;
+    try {
+      const { localDb } = await import('@/lib/storage/indexedDbHelper');
+      await localDb.saveMessage({
+        conversation_id: conversationId,
+        role: message.role,
+        content: message.content,
+        model_id: message.id || undefined,
+        tool_calls: (message as any).tool_calls || null,
+        created_at: new Date().toISOString(),
+      });
+    } catch (e) {
+      console.error('Error in saveLocalMessage:', e);
+    }
+  },
+
+  syncConversationsWithBackend: async (apiList, guestId, userId) => {
+    if (typeof window === 'undefined') return;
+    try {
+      const { localDb } = await import('@/lib/storage/indexedDbHelper');
+      const localConvs = apiList.map((c: any) => ({
+        id: c.id,
+        title: c.title || 'Untitled Thread',
+        created_at: c.created_at,
+        user_id: userId,
+        guest_id: guestId,
+        last_updated: c.created_at,
+      }));
+      await localDb.bulkSaveConversations(localConvs);
+      const updatedLocal = await localDb.getAllConversations(guestId, userId);
+      set({ conversations: updatedLocal });
+    } catch (e) {
+      console.error('Error in syncConversationsWithBackend:', e);
+    }
+  },
 }));
+

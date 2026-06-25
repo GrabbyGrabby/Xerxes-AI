@@ -60,7 +60,14 @@ export default function MessageStream() {
         <motion.div
           layoutId="xerxes-header-container"
           className="flex flex-col justify-center items-center text-center p-6 space-y-3 max-w-3xl mx-auto select-none my-auto min-h-[55vh]"
-          transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+          initial={{ scale: 0.85, y: 16, opacity: 0 }}
+          animate={{ scale: 1, y: 0, opacity: 1 }}
+          whileHover={{ 
+            scale: 1.03,
+            y: -2,
+            transition: { type: "spring", stiffness: 400, damping: 14 }
+          }}
+          transition={{ type: 'spring', damping: 22, stiffness: 180 }}
         >
           {/* Logo image with layoutId for transition */}
           <motion.div
@@ -68,7 +75,7 @@ export default function MessageStream() {
             initial={{ scale: 0.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="w-28 h-28 mb-2 bg-transparent shrink-0"
+            className="w-28 h-28 mb-2 bg-transparent shrink-0 filter drop-shadow-[0_4px_10px_rgba(0,0,0,0.3)] hover:drop-shadow-[0_10px_20px_rgba(0,0,0,0.45)] transition-all duration-300 cursor-pointer"
           >
             <img src="/logo.png" alt="Xerxes AI Logo" className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(255,255,255,0.18)]" />
           </motion.div>
@@ -79,7 +86,7 @@ export default function MessageStream() {
             initial={{ scale: 0.8, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="font-header text-5xl md:text-7xl font-bold text-[#FAF1EB] tracking-wide leading-none drop-shadow-2xl shadow-black/10"
+            className="font-header text-5xl md:text-7xl font-bold text-[#FAF1EB] tracking-wide leading-none drop-shadow-2xl shadow-black/10 cursor-pointer"
           >
             Xerxes AI
           </motion.h2>
