@@ -111,3 +111,47 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  const session = await getAuthSession(req);
+  if (!session.userId && !session.guestId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const body = await req.json();
+    const { id, title } = body;
+    if (!id || !title) {
+      return NextResponse.json({ error: 'Missing conversation ID or title' }, { status: 400 });
+    }
+
+    const { data: conv, error: convErr } = await supabaseServer
+      .from('conversations')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (convErr || !conv) {
+      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
+    }
+
+    if (session.userId && conv.user_id !== session.userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    if (session.guestId && conv.guest_id !== session.guestId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const { error: updateErr } = await supabaseServer
+      .from('conversations')
+      .update({ title })
+      .eq('id', id);
+
+    if (updateErr) throw updateErr;
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error('Error updating conversation title:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
