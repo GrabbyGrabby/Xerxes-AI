@@ -180,6 +180,7 @@ export default function Composer() {
     addMessage({
       role: 'assistant',
       content: '',
+      id: activeModelId,
     });
 
     try {
@@ -290,6 +291,7 @@ export default function Composer() {
             conversation_id: activeConversationId!,
             role: 'assistant',
             content: assistantMessage.content,
+            model_id: assistantMessage.id || activeModelId,
             created_at: new Date().toISOString(),
           });
         } catch (localErr) {

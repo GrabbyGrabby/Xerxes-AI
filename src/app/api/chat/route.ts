@@ -281,32 +281,32 @@ export async function POST(req: NextRequest) {
 
       try {
         let currentConversationId = conversationId;
+        const firstUserMsg = messages.find((m: any) => m.role === 'user')?.content || 'New Chat';
+        let chatTitle = firstUserMsg.slice(0, 35) + (firstUserMsg.length > 35 ? '...' : '');
         
         // Auto-create or ensure conversation exists in database
         if (isSupabaseConfigured) {
           try {
-            const firstUserMsg = messages.find((m: any) => m.role === 'user')?.content || 'New Chat';
-            const title = firstUserMsg.slice(0, 35) + (firstUserMsg.length > 35 ? '...' : '');
-
             if (!currentConversationId) {
               const { data: newConv, error: newConvErr } = await supabaseServer
                 .from('conversations')
                 .insert({
                   user_id: session.userId || null,
                   guest_id: session.guestId || null,
-                  title: title,
+                  title: chatTitle,
                 })
                 .select('*')
                 .single();
 
               if (!newConvErr && newConv) {
                 currentConversationId = newConv.id;
+                chatTitle = newConv.title || chatTitle;
               }
             } else {
               // Ensure conversation exists in DB since client generates local UUIDs first
               const { data: existingConv } = await supabaseServer
                 .from('conversations')
-                .select('id')
+                .select('id, title')
                 .eq('id', currentConversationId)
                 .single();
 
@@ -317,8 +317,10 @@ export async function POST(req: NextRequest) {
                     id: currentConversationId,
                     user_id: session.userId || null,
                     guest_id: session.guestId || null,
-                    title: title,
+                    title: chatTitle,
                   });
+              } else {
+                chatTitle = existingConv.title || chatTitle;
               }
             }
           } catch (dbErr) {
@@ -492,7 +494,7 @@ export async function POST(req: NextRequest) {
                 user_id: session.userId || null,
                 guest_id: session.guestId || null,
                 amount: -finalCost,
-                reason: `Chat completion using ${modelId}`,
+                reason: `Chat: "${chatTitle}"`,
                 model_used: modelId,
                 tokens_in: inputTokens,
                 tokens_out: totalOutputTokens,

@@ -8,13 +8,33 @@ import { motion, AnimatePresence } from 'framer-motion';
 import AgentStepCard from './AgentStepCard';
 import XerxesSphere from '../three/XerxesSphere';
 
+const getModelDisplayName = (modelId: string | undefined, availableModels: any[]) => {
+  if (!modelId) return '';
+  const found = availableModels.find(m => m.id === modelId);
+  if (found) return found.display_name;
+  
+  const map: Record<string, string> = {
+    'minimaxai/minimax-m3': 'MiniMax M3',
+    'deepseek-ai/deepseek-v4-flash': 'DeepSeek V4 Flash',
+    'gemini-2.5-pro': 'Gemini 2.5 Pro',
+    'gemini-2.5-flash': 'Gemini 2.5 Flash',
+    'gemini-2.0-flash': 'Gemini 2.0 Flash',
+    'gemini-1.5-pro': 'Gemini 1.5 Pro',
+    'gemini-1.5-flash': 'Gemini 1.5 Flash',
+  };
+  return map[modelId] || modelId;
+};
+
 export default function MessageStream() {
   const { user } = usePrivy();
   const messages = useSessionStore((state) => state.messages);
   const activeToolCalls = useSessionStore((state) => state.activeToolCalls);
   const isStreaming = useSessionStore((state) => state.isStreaming);
   const setActiveModelId = useSessionStore((state) => state.setActiveModelId);
+  const availableModels = useSessionStore((state) => state.availableModels);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  const [copiedMessageIndex, setCopiedMessageIndex] = useState<number | null>(null);
 
   // Auto-scroll helper
   useEffect(() => {
@@ -110,6 +130,8 @@ export default function MessageStream() {
 
               if (msg.role === 'tool' || msg.role === 'system') return null;
 
+              const msgModelId = msg.id || (msg as any).model_id;
+
               return (
                 <motion.div
                   key={index}
@@ -128,9 +150,18 @@ export default function MessageStream() {
 
                   {/* Message bubble wrapper */}
                   <div className="flex flex-col gap-1.5 max-w-[85%]">
-                    <span className="text-[10px] text-[#7E6C68] font-semibold tracking-wide px-1.5 font-sans">
-                      {isUser ? (user?.email?.address || 'User') : 'Xerxes'}
-                    </span>
+                    <div className="flex items-center gap-1.5 px-1.5 text-[10px] text-[#7E6C68] font-semibold tracking-wide font-sans">
+                      <span>{isUser ? (user?.email?.address || 'User') : 'Xerxes'}</span>
+                      {!isUser && msgModelId && (
+                        <>
+                          <span className="text-[#7E6C68]/40">•</span>
+                          <span className="text-[9px] text-[#7E6C68]/80 font-normal font-mono flex items-center gap-0.5 bg-[#FAF1EB] px-1.5 py-0.5 rounded-md border border-[#EFE0D4]/60">
+                            <Cpu className="w-2.5 h-2.5 opacity-70 text-[#7E6C68]/60" />
+                            {getModelDisplayName(msgModelId, availableModels)}
+                          </span>
+                        </>
+                      )}
+                    </div>
 
                     {/* Chat Bubble - Consistent light beige theme */}
                     <div
@@ -156,6 +187,32 @@ export default function MessageStream() {
                         )}
                       </div>
                     </div>
+
+                    {/* Copy action below assistant message bubble (hidden during streaming) */}
+                    {!isUser && msg.content !== '' && (!isLast || !isStreaming) && (
+                      <div className="flex items-center gap-3 px-1 mt-0.5">
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(msg.content);
+                            setCopiedMessageIndex(index);
+                            setTimeout(() => setCopiedMessageIndex(null), 2000);
+                          }}
+                          className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-[#7E6C68]/60 hover:text-[#301A15] hover:bg-[#F5EAE1]/40 border border-transparent hover:border-[#EFE0D4]/50 transition-all cursor-pointer font-sans"
+                        >
+                          {copiedMessageIndex === index ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-600" />
+                              <span className="text-emerald-600 font-medium">Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" />
+                              <span>Copy response</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
 
                     {/* Collapsible tools */}
                     {!isUser && isLast && activeToolCalls.length > 0 && (

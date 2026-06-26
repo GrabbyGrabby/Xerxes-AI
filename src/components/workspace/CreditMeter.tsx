@@ -6,11 +6,27 @@ import { useSessionStore } from '@/store/useSessionStore';
 import { usePrivy } from '@privy-io/react-auth';
 import { History, Loader2, Info } from 'lucide-react';
 
+const getModelDisplayName = (modelId: string, availableModels: any[]) => {
+  const found = availableModels.find((m: any) => m.id === modelId);
+  if (found) return found.display_name;
+  const map: Record<string, string> = {
+    'minimaxai/minimax-m3': 'MiniMax M3',
+    'deepseek-ai/deepseek-v4-flash': 'DeepSeek V4 Flash',
+    'gemini-2.5-pro': 'Gemini 2.5 Pro',
+    'gemini-2.5-flash': 'Gemini 2.5 Flash',
+    'gemini-2.0-flash': 'Gemini 2.0 Flash',
+    'gemini-1.5-pro': 'Gemini 1.5 Pro',
+    'gemini-1.5-flash': 'Gemini 1.5 Flash',
+  };
+  return map[modelId] || modelId;
+};
+
 export default function CreditMeter() {
   const { authenticated, getAccessToken } = usePrivy();
   const credits = useSessionStore((state) => state.credits);
   const setCredits = useSessionStore((state) => state.setCredits);
   const guestId = useSessionStore((state) => state.guestId);
+  const availableModels = useSessionStore((state) => state.availableModels);
   const [isOpen, setIsOpen] = useState(false);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
@@ -109,26 +125,38 @@ export default function CreditMeter() {
                   <p className="text-xs text-white/30 text-center py-4 font-medium font-sans">No transactions registered.</p>
                 ) : (
                   <div className="max-h-40 overflow-y-auto space-y-1.5 pr-1 font-sans tiny-scrollbar">
-                    {transactions.map((tx) => (
-                      <div
-                        key={tx.id}
-                        className="flex justify-between items-center gap-2 p-2 rounded-[12px] bg-[#301A15]/40 border border-[#4A2F29] hover:border-[#D35E43]/40 transition-all text-xs"
-                      >
-                        <div className="overflow-hidden">
-                          <p className="text-white truncate font-semibold">{tx.reason}</p>
-                          <p className="text-[9px] text-white/50 mt-0.5 font-mono">
-                            {new Date(tx.created_at).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <span
-                          className={`font-bold font-mono ${
-                            tx.amount > 0 ? 'text-emerald-400' : 'text-[#D35E43]'
-                          }`}
+                    {transactions.map((tx) => {
+                      const displayReason = tx.reason.startsWith('Chat completion using ')
+                        ? 'Chat Session'
+                        : tx.reason;
+                      return (
+                        <div
+                          key={tx.id}
+                          className="flex justify-between items-center gap-2 p-2 rounded-[12px] bg-[#301A15]/40 border border-[#4A2F29] hover:border-[#D35E43]/40 transition-all text-xs"
                         >
-                          {tx.amount > 0 ? `+${tx.amount}` : tx.amount}
-                        </span>
-                      </div>
-                    ))}
+                          <div className="overflow-hidden flex-1">
+                            <p className="text-white truncate font-semibold" title={displayReason}>{displayReason}</p>
+                            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                              {tx.model_used && (
+                                <span className="text-[9px] font-mono font-medium text-white/70 bg-[#4A2F29]/60 px-1 py-0.2 rounded border border-[#4A2F29]/80">
+                                  {getModelDisplayName(tx.model_used, availableModels)}
+                                </span>
+                              )}
+                              <span className="text-[9px] text-white/40 font-mono">
+                                {new Date(tx.created_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                          <span
+                            className={`font-bold font-mono shrink-0 ${
+                              tx.amount > 0 ? 'text-emerald-400' : 'text-[#D35E43]'
+                            }`}
+                          >
+                            {tx.amount > 0 ? `+${tx.amount}` : tx.amount}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
