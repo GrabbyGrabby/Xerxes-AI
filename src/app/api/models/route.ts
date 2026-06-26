@@ -8,6 +8,7 @@ const SUPPORTED_MODELS = [
   { id: 'deepseek-ai/deepseek-v4-flash', provider: 'nvidia', display_name: 'DeepSeek V4 Flash (NVIDIA)', description: 'Reasoning model by DeepSeek', category: 'reasoning', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: false, supports_tools: true, is_active: true },
   
   // Gemini
+  { id: 'gemini-3.5-flash', provider: 'gemini', display_name: 'Gemini 3.5 Flash', description: 'Next-generation Gemini Flash model', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: true, supports_tools: true, is_active: true },
   { id: 'gemini-2.5-pro', provider: 'gemini', display_name: 'Gemini 2.5 Pro', description: 'Advanced large context model', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: true, supports_tools: true, is_active: true },
   { id: 'gemini-2.5-flash', provider: 'gemini', display_name: 'Gemini 2.5 Flash', description: 'Fast multimodal model', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: true, supports_tools: true, is_active: true },
   { id: 'gemini-2.0-flash', provider: 'gemini', display_name: 'Gemini 2.0 Flash', description: 'Lightweight and fast', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: true, supports_tools: true, is_active: true },
@@ -15,6 +16,7 @@ const SUPPORTED_MODELS = [
   { id: 'gemini-1.5-flash', provider: 'gemini', display_name: 'Gemini 1.5 Flash', description: 'Quick responses', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: true, supports_tools: true, is_active: true },
 
   // OpenRouter (Free/Standard)
+  { id: 'openrouter/free', provider: 'openrouter', display_name: 'OpenRouter Free Router', description: 'Dynamic routing to currently available free models', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: false, supports_tools: true, is_active: true },
   { id: 'deepseek/deepseek-r1', provider: 'openrouter', display_name: 'DeepSeek R1 (OpenRouter)', description: 'State-of-the-art reasoning model', category: 'reasoning', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: false, supports_tools: false, is_active: true },
   { id: 'google/gemini-2.0-flash', provider: 'openrouter', display_name: 'Gemini 2.0 Flash (OpenRouter)', description: 'Google Gemini via OpenRouter', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: true, supports_tools: true, is_active: true },
   { id: 'meta-llama/llama-3.3-70b-instruct:free', provider: 'openrouter', display_name: 'Llama 3.3 70B (OpenRouter Free)', description: 'Powerful Meta LLM', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_vision: false, supports_tools: true, is_active: true },
@@ -32,7 +34,7 @@ export async function GET(req: NextRequest) {
       nvidia: !!process.env.NVIDIA_NIM_API_KEY,
       gemini: !!process.env.GEMINI_API_KEY,
       openrouter: !!process.env.OPENROUTER_API_KEY,
-      mistral: !!process.env.MISTRAL_API_KEY,
+      mistral: !!process.env.MISTRAL_API_KEY || !!process.env.OPENROUTER_API_KEY,
     };
 
     let modelsWithHealth = SUPPORTED_MODELS

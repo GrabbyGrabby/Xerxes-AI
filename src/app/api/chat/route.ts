@@ -140,6 +140,7 @@ export async function POST(req: NextRequest) {
     { id: 'deepseek-ai/deepseek-v4-flash', provider: 'nvidia', category: 'reasoning', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
     
     // Gemini
+    { id: 'gemini-3.5-flash', provider: 'gemini', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
     { id: 'gemini-2.5-pro', provider: 'gemini', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
     { id: 'gemini-2.5-flash', provider: 'gemini', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
     { id: 'gemini-2.0-flash', provider: 'gemini', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
@@ -147,8 +148,9 @@ export async function POST(req: NextRequest) {
     { id: 'gemini-1.5-flash', provider: 'gemini', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
 
     // OpenRouter (Free/Standard)
+    { id: 'openrouter/free', provider: 'openrouter', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
     { id: 'deepseek/deepseek-r1', provider: 'openrouter', category: 'reasoning', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: false },
-    { id: 'google/gemini-2.0-flash', provider: 'openrouter', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
+    { id: 'google/gemini-2.0-flash-001', provider: 'openrouter', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
     { id: 'meta-llama/llama-3.3-70b-instruct:free', provider: 'openrouter', category: 'chat', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
 
     // Mistral AI
@@ -157,7 +159,17 @@ export async function POST(req: NextRequest) {
     { id: 'codestral-latest', provider: 'mistral', category: 'coding', credit_cost_per_1k_input: 0, credit_cost_per_1k_output: 0, supports_tools: true },
   ];
 
-  const modelInfo = SUPPORTED_MODELS.find((m) => m.id === modelId);
+  // Resolve modelId with mapping fallback to avoid 404s on the Gemini key
+  let resolvedModelId = modelId;
+  if (modelId === 'gemini-1.5-flash') {
+    resolvedModelId = 'gemini-2.5-flash';
+  } else if (modelId === 'gemini-1.5-pro') {
+    resolvedModelId = 'gemini-2.5-pro';
+  } else if (modelId === 'google/gemini-2.0-flash') {
+    resolvedModelId = 'google/gemini-2.0-flash-001';
+  }
+
+  const modelInfo = SUPPORTED_MODELS.find((m) => m.id === modelId || m.id === resolvedModelId);
 
   if (!modelInfo) {
     return new Response(JSON.stringify({ error: `Model "${modelId}" is not supported.` }), {
@@ -168,8 +180,23 @@ export async function POST(req: NextRequest) {
 
   const creditCostIn = Number(modelInfo?.credit_cost_per_1k_input ?? 1);
   const creditCostOut = Number(modelInfo?.credit_cost_per_1k_output ?? 1);
-  const providerName = modelInfo?.provider ?? (process.env.GEMINI_API_KEY ? 'gemini' : 'nvidia');
-  const supportsTools = modelInfo?.supports_tools ?? true;
+  
+  let providerName = modelInfo?.provider ?? (process.env.GEMINI_API_KEY ? 'gemini' : 'nvidia');
+  let finalModelId = modelInfo?.id ?? resolvedModelId;
+  let supportsTools = modelInfo?.supports_tools ?? true;
+
+  // Fallback Mistral to OpenRouter because the dedicated Mistral API key is unauthorized/expired
+  if (providerName === 'mistral') {
+    providerName = 'openrouter';
+    supportsTools = false; // Disable tools for Mistral fallback to prevent OpenRouter tool 404s
+    if (finalModelId === 'mistral-large-latest') {
+      finalModelId = 'mistralai/mistral-large';
+    } else if (finalModelId === 'mistral-small-latest') {
+      finalModelId = 'mistralai/mistral-small-24b-instruct-2501';
+    } else if (finalModelId === 'codestral-latest') {
+      finalModelId = 'mistralai/codestral-2508';
+    }
+  }
 
   const isSupabaseConfigured = 
     process.env.NEXT_PUBLIC_SUPABASE_URL && 
@@ -351,7 +378,7 @@ export async function POST(req: NextRequest) {
           try {
             const providerStream = activeProvider.streamChat({
               messages: history,
-              model: modelId,
+              model: finalModelId,
               tools: supportsTools ? AGENT_TOOLS : undefined,
               images,
             });
@@ -379,7 +406,8 @@ export async function POST(req: NextRequest) {
             sendSSE('error', {
               message: `Stream error on "${providerName}": ${streamError.message}`,
             });
-            throw streamError;
+            isFinalAnswerGenerated = true;
+            break;
           }
 
           if (toolCallReceived && pendingToolCall) {

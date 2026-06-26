@@ -20,9 +20,24 @@ export default function AgentStepCard({ step }: { step: ToolStatus }) {
     ? 'Web Search Agent'
     : 'File Knowledge QA';
 
-  const queryText = step.arguments 
-    ? JSON.parse(step.arguments || '{}').query 
-    : '';
+  let queryText = '';
+  try {
+    if (step.arguments) {
+      const parsed = JSON.parse(step.arguments);
+      queryText = parsed.query || '';
+    }
+  } catch (e) {
+    // If not valid JSON, fallback to showing the arguments string directly
+    queryText = step.arguments || '';
+  }
+
+  const renderArguments = () => {
+    try {
+      return JSON.stringify(JSON.parse(step.arguments || '{}'), null, 2);
+    } catch (e) {
+      return step.arguments;
+    }
+  };
 
   return (
     <div className="w-full my-2 border border-[#EFE0D4] bg-[#FDF6F0]/80 backdrop-blur-md rounded-2xl overflow-hidden text-xs shadow-[0_2px_8px_rgba(48,26,21,0.02)]">
@@ -68,7 +83,7 @@ export default function AgentStepCard({ step }: { step: ToolStatus }) {
             <div>
               <span className="text-[#D35E43] font-bold">Input Arguments:</span>
               <pre className="mt-1 bg-[#FDF6F0] border border-[#EFE0D4] p-2.5 rounded-[12px] text-[#301A15]/80 overflow-x-auto whitespace-pre-wrap">
-                {JSON.stringify(JSON.parse(step.arguments), null, 2)}
+                {renderArguments()}
               </pre>
             </div>
           )}
