@@ -64,6 +64,7 @@ export default function ModelPicker() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.94, y: 12 }}
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+              onClick={() => setIsOpen(false)}
               className="absolute left-0 bottom-full mb-3 w-64 bg-card border border-border rounded-[28px] p-2.5 z-50 shadow-[0_16px_40px_rgba(0,0,0,0.12)] overflow-hidden text-card-foreground"
             >
               <div className="px-3 py-1.5 border-b border-border mb-1.5">

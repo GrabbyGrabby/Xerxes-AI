@@ -223,18 +223,13 @@ export default function MessageStream() {
                             setCopiedMessageIndex(index);
                             setTimeout(() => setCopiedMessageIndex(null), 2000);
                           }}
-                          className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-muted-foreground/60 hover:text-foreground hover:bg-card/40 border border-transparent hover:border-border/50 transition-all cursor-pointer font-sans"
+                          className="p-1.5 rounded-full text-muted-foreground/60 hover:text-foreground hover:bg-card border border-transparent hover:border-border/30 transition-all cursor-pointer"
+                          title="Copy response"
                         >
                           {copiedMessageIndex === index ? (
-                            <>
-                              <Check className="w-3 h-3 text-emerald-600" />
-                              <span className="text-emerald-600 font-medium">Copied</span>
-                            </>
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
                           ) : (
-                            <>
-                              <Copy className="w-3 h-3" />
-                              <span>Copy response</span>
-                            </>
+                            <Copy className="w-3.5 h-3.5" />
                           )}
                         </button>
                       </div>

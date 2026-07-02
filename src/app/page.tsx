@@ -290,10 +290,11 @@ export default function WorkspacePage() {
   const showLogin = !authenticated && !isGuestMode;
 
   if (showLogin) {
+    const loginHeaderColor = themeMode === 'plaster' ? '#000000' : '#ffffff';
     return (
       <main className="w-full h-[100dvh] overflow-y-auto md:overflow-hidden flex flex-col items-center justify-start md:justify-center relative font-sans py-12 md:py-0 select-none">
         {/* Animated fluid waves background */}
-        <WavesBackground />
+        <WavesBackground isLoginPage={true} />
 
         {/* Header Title for Mobile */}
         <div className="md:hidden flex flex-col items-center text-center mb-6 z-10 select-none px-4">
@@ -304,10 +305,10 @@ export default function WorkspacePage() {
               className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.15)]" 
             />
           </div>
-          <h1 className="font-header text-4xl font-extrabold tracking-wide leading-none transition-colors duration-1000" style={{ color: '#000000' }}>
+          <h1 className="font-header text-4xl font-extrabold tracking-wide leading-none transition-colors duration-1000" style={{ color: loginHeaderColor }}>
             Xerxes AI
           </h1>
-          <p className="font-header text-sm font-bold tracking-wide mt-2 uppercase transition-colors duration-1000" style={{ color: '#000000' }}>
+          <p className="font-header text-sm font-bold tracking-wide mt-2 uppercase transition-colors duration-1000" style={{ color: loginHeaderColor }}>
             One Agent, All Your Workflows!
           </p>
         </div>
@@ -331,11 +332,11 @@ export default function WorkspacePage() {
                     className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.15)]" 
                   />
                 </div>
-                <h1 className="font-header text-5xl md:text-6xl font-extrabold tracking-wide leading-none transition-colors duration-1000" style={{ color: '#000000' }}>
+                <h1 className="font-header text-5xl md:text-6xl font-extrabold tracking-wide leading-none transition-colors duration-1000" style={{ color: loginHeaderColor }}>
                   Xerxes AI
                 </h1>
               </div>
-              <p className="font-header text-lg md:text-xl font-bold tracking-wider mt-1 pl-1 text-left uppercase transition-colors duration-1000" style={{ color: '#000000' }}>
+              <p className="font-header text-lg md:text-xl font-bold tracking-wider mt-1 pl-1 text-left uppercase transition-colors duration-1000" style={{ color: loginHeaderColor }}>
                 One Agent, All Your Workflows!
               </p>
             </motion.div>
@@ -396,8 +397,8 @@ export default function WorkspacePage() {
     );
   }
 
-  const activeTextClass = themeMode === 'plaster' ? 'text-[#800021]' : 'text-[#0A1931]';
-  const hoverTextClass = themeMode === 'plaster' ? 'hover:text-[#800021]' : 'hover:text-[#0A1931]';
+  const activeTextClass = themeMode === 'plaster' ? 'text-[#800021]' : 'text-[#042842]';
+  const hoverTextClass = themeMode === 'plaster' ? 'hover:text-[#800021]' : 'hover:text-[#042842]';
 
   return (
     <main className="w-full h-[100dvh] overflow-hidden flex flex-col relative bg-background text-foreground font-sans transition-colors duration-1000">
@@ -506,7 +507,7 @@ export default function WorkspacePage() {
           onMouseLeave={() => setIsSidebarOpen(false)}
           animate={{ width: isSidebarOpen ? 260 : 72 }}
           transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-          className={`absolute md:relative h-[calc(100dvh-2rem)] my-4 md:ml-4 bg-card/85 backdrop-blur-2xl border border-border/30 rounded-[28px] flex flex-col justify-between py-6 z-50 select-none shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden shrink-0 text-card-foreground transition-transform duration-300 ${
+          className={`absolute md:relative h-[calc(100dvh-2rem)] my-4 md:ml-4 bg-card backdrop-blur-2xl border border-border/30 rounded-[28px] flex flex-col justify-between py-6 z-50 select-none shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden shrink-0 text-card-foreground transition-transform duration-300 ${
             isSidebarOpen ? 'translate-x-4 md:translate-x-0' : '-translate-x-32 md:translate-x-0'
           }`}
         >
@@ -536,7 +537,7 @@ export default function WorkspacePage() {
                 onClick={startNewChat}
                 className={`w-full h-10 bg-foreground/10 border border-border/15 hover:bg-white ${hoverTextClass} hover:shadow-sm text-card-foreground font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap`}
               >
-                <Plus className="w-4 h-4 shrink-0 text-accent" />
+                <Plus className={`w-4 h-4 shrink-0 ${themeMode === 'plaster' ? 'text-white' : 'text-accent'}`} />
                 {isSidebarOpen && <span>New Chat</span>}
               </button>
             </div>

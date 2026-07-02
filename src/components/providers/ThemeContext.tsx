@@ -37,20 +37,20 @@ export const OCEAN_PALETTE: ColorPalette = {
   labels: ['0A1931', 'B3CFE5', '4A7FA7', '1A3D63', 'F6FAFD'],
   visualColors: ['#0A1931', '#B3CFE5', '#4A7FA7', '#1A3D63', '#F6FAFD'],
   themeColors: {
-    background: '#0A1931',
-    foreground: '#F6FAFD',
-    card: '#1A3D63',
-    cardForeground: '#F6FAFD',
-    primary: '#B3CFE5',
-    primaryForeground: '#0A1931',
-    secondary: '#4A7FA7',
+    background: '#FFCC4C',         // Warm sand/yellow background on main page
+    foreground: '#042842',         // Deep navy text on main page background
+    card: '#042842',               // Deep navy card/sidebar/composer/picker/credits
+    cardForeground: '#FAF5EF',     // Light cream text on cards
+    primary: '#FFCC4C',            // Accent color matching background
+    primaryForeground: '#042842',
+    secondary: '#1A3D63',          // Medium navy
     secondaryForeground: '#F6FAFD',
-    muted: '#1A3D63',
+    muted: '#FFCC4C',
     mutedForeground: '#4A7FA7',
-    accent: '#B3CFE5',
-    accentForeground: '#0A1931',
-    border: '#1A3D63',
-    ring: '#B3CFE5',
+    accent: '#FFCC4C',             // Highlight accent
+    accentForeground: '#042842',
+    border: '#1A3D63',             // Medium navy border
+    ring: '#042842',
   }
 };
 
@@ -62,19 +62,19 @@ export const PLASTER_PALETTE: ColorPalette = {
   visualColors: ['#7192A1', '#EADFCB', '#C08E66', '#BE5731', '#042842', '#FAF5EF'], // Corrected visuals for Rust/Cream
   themeColors: {
     background: '#FAF5EF',         // Milky/off-white background
-    foreground: '#042842',         // Deep navy text
-    card: '#EADFCB',               // Milky card background
-    cardForeground: '#000000',     // Black text on card
+    foreground: '#800021',         // Deep burgundy text
+    card: '#800021',               // Deep burgundy card/sidebar/composer/bubbles
+    cardForeground: '#FAF5EF',     // Milky cream text on card
     primary: '#7192A1',            // Slate Blue
     primaryForeground: '#FAF5EF',
-    secondary: '#C08E66',          // Tan
-    secondaryForeground: '#000000',
+    secondary: '#881144',          // Plum
+    secondaryForeground: '#FAF5EF',
     muted: '#FAF5EF',
-    mutedForeground: '#7192A1',    // Slate blue for muted labels (highly visible!)
-    accent: '#BE5731',             // Terracotta orange
-    accentForeground: '#FFFFFF',
-    border: '#C08E66',             // Tan border
-    ring: '#7192A1',
+    mutedForeground: '#7192A1',    // Slate blue for muted labels
+    accent: '#800021',             // Deep burgundy accent
+    accentForeground: '#FAF5EF',
+    border: '#881144',             // Plum border
+    ring: '#800021',
   }
 };
 

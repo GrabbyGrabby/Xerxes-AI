@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useTheme } from '../providers/ThemeContext';
 
-export default function WavesBackground() {
+export default function WavesBackground({ isLoginPage = false }: { isLoginPage?: boolean }) {
   const { themeMode, activeColors } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -100,14 +100,24 @@ export default function WavesBackground() {
 
   const isOcean = themeMode === 'ocean' || themeMode === 'default';
 
+  // Overrides to keep login page background static deep navy in Ocean mode
+  const bgVal = isLoginPage ? '#0A1931' : activeColors.background;
+  const secondaryVal = isLoginPage ? '#4A7FA7' : activeColors.secondary;
+  const mutedVal = isLoginPage ? '#1A3D63' : activeColors.muted;
+  const cardVal = isLoginPage ? '#1A3D63' : activeColors.card;
+  const primaryVal = isLoginPage ? '#B3CFE5' : activeColors.primary;
+
   return (
-    <div className="absolute inset-0 z-[-2] overflow-hidden select-none pointer-events-none transition-colors duration-1000 bg-background">
+    <div 
+      className="absolute inset-0 z-[-2] overflow-hidden select-none pointer-events-none transition-colors duration-1000"
+      style={{ backgroundColor: bgVal }}
+    >
       {/* Dynamic Base Radial Glow */}
       <div 
         className="absolute inset-0 transition-opacity duration-1000"
         style={{
           background: isOcean 
-            ? `radial-gradient(circle at 50% -20%, ${activeColors.secondary} 0%, ${activeColors.background} 80%)`
+            ? `radial-gradient(circle at 50% -20%, ${secondaryVal} 0%, ${bgVal} 80%)`
             : `radial-gradient(circle at 50% 120%, ${activeColors.primary}10 0%, ${activeColors.background} 90%)`,
         }}
       />
@@ -122,20 +132,20 @@ export default function WavesBackground() {
           >
             <defs>
               <linearGradient id="wave-grad-0" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={activeColors.muted} stopOpacity="0.8" />
-                <stop offset="100%" stopColor={activeColors.background} />
+                <stop offset="0%" stopColor={mutedVal} stopOpacity="0.8" />
+                <stop offset="100%" stopColor={bgVal} />
               </linearGradient>
               <linearGradient id="wave-grad-1" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={activeColors.secondary} stopOpacity="0.75" />
-                <stop offset="100%" stopColor={activeColors.background} />
+                <stop offset="0%" stopColor={secondaryVal} stopOpacity="0.75" />
+                <stop offset="100%" stopColor={bgVal} />
               </linearGradient>
               <linearGradient id="wave-grad-2" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={activeColors.card} stopOpacity="0.65" />
-                <stop offset="100%" stopColor={activeColors.background} />
+                <stop offset="0%" stopColor={cardVal} stopOpacity="0.65" />
+                <stop offset="100%" stopColor={bgVal} />
               </linearGradient>
               <linearGradient id="wave-grad-3" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={activeColors.primary} stopOpacity="0.4" />
-                <stop offset="100%" stopColor={activeColors.background} />
+                <stop offset="0%" stopColor={primaryVal} stopOpacity="0.4" />
+                <stop offset="100%" stopColor={bgVal} />
               </linearGradient>
             </defs>
 
