@@ -27,7 +27,7 @@ function SphereMesh({ size }: { size: 'small' | 'large' }) {
 
   return (
     <mesh ref={meshRef}>
-      <sphereGeometry args={[1, 64, 64]} />
+      <sphereGeometry args={[0.65, 64, 64]} />
       {/* Super shiny polished black chrome/silver metal */}
       <meshPhysicalMaterial
         color="#ffffff"
@@ -53,12 +53,12 @@ export default function XerxesSphere({ size = 'small' }: { size?: 'small' | 'lar
   }
 
   // Smaller dimensions as requested to fit perfectly
-  const dimensions = size === 'small' ? 'w-6 h-6' : 'w-14 h-14';
+  const dimensions = size === 'small' ? 'w-5 h-5' : 'w-14 h-14';
 
   return (
     <div className={`${dimensions} shrink-0 select-none pointer-events-none overflow-hidden flex items-center justify-center`}>
       <Canvas 
-        camera={{ position: [0, 0, 2.3], fov: 50 }} 
+        camera={{ position: [0, 0, 2.5], fov: 50 }} 
         gl={{ alpha: true, antialias: true }}
         style={{ width: '100%', height: '100%' }}
       >

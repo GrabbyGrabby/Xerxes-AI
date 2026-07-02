@@ -61,19 +61,19 @@ export default function CreditMeter() {
 
   return (
     <div className="relative">
-      {/* Inverted pista green trigger button */}
+      {/* Inverted theme trigger button */}
       <button
         onClick={() => {
           setIsOpen(!isOpen);
           if (!isOpen) fetchCreditsData();
         }}
-        className="flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#1F110E]/15 bg-[#ccfbf1] hover:bg-[#ccfbf1]/90 transition-all text-xs text-[#1F110E] shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer select-none font-sans font-bold"
+        className="flex items-center gap-1.5 px-4 py-2 rounded-full border border-border/15 bg-card hover:bg-card/90 transition-all text-xs text-card-foreground shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer select-none font-sans font-bold"
       >
-        <span className="text-[#1F110E]/60 font-semibold text-[10px] tracking-tight uppercase">Credits:</span>
-        <span className="font-header font-black text-xs text-[#1F110E] tracking-tight">{credits}</span>
+        <span className="text-card-foreground/60 font-semibold text-[10px] tracking-tight uppercase">Credits:</span>
+        <span className="font-header font-black text-xs text-card-foreground tracking-tight">{credits}</span>
       </button>
 
-      {/* Dark brown dropdown panel */}
+      {/* Theme adaptive dropdown panel */}
       <AnimatePresence>
         {isOpen && (
           <>
@@ -84,27 +84,27 @@ export default function CreditMeter() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.94, y: 12 }}
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="absolute right-0 mt-3 w-80 bg-[#1F110E] border border-[#4A2F29] rounded-[24px] p-4.5 z-50 text-sm shadow-[0_16px_48px_rgba(0,0,0,0.12)] overflow-hidden text-white"
+              className="absolute right-0 mt-3 w-80 bg-card border border-border rounded-[24px] p-4.5 z-50 text-sm shadow-[0_16px_48px_rgba(0,0,0,0.12)] overflow-hidden text-card-foreground"
             >
               {/* Credits overview */}
-              <div className="pb-3 border-b border-[#4A2F29]">
-                <h4 className="font-header font-black text-xs text-white mb-2 flex items-center gap-1">
+              <div className="pb-3 border-b border-border">
+                <h4 className="font-header font-black text-xs text-card-foreground mb-2 flex items-center gap-1">
                   Credits Account
                 </h4>
                 
-                <div className="bg-[#301A15] border border-[#4A2F29] rounded-[16px] p-3 text-xs text-white space-y-2 mt-2 leading-relaxed font-sans">
+                <div className="bg-secondary border border-border rounded-[16px] p-3 text-xs text-secondary-foreground space-y-2 mt-2 leading-relaxed font-sans">
                   <div className="flex items-start gap-1.5">
-                    <Info className="w-3.5 h-3.5 text-[#D35E43] shrink-0 mt-0.5" />
+                    <Info className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" />
                     <div>
                       <p className="font-bold">Google & GitHub Signup:</p>
-                      <p className="text-white/70 text-[10px]">Receive <strong className="text-white">500 free credits</strong> immediately upon login onboarding.</p>
+                      <p className="text-secondary-foreground/70 text-[10px]">Receive <strong className="text-secondary-foreground">500 free credits</strong> immediately upon login onboarding.</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-1.5 pt-1 border-t border-[#4A2F29]">
-                    <Info className="w-3.5 h-3.5 text-white/50 shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-1.5 pt-1 border-t border-border">
+                    <Info className="w-3.5 h-3.5 text-secondary-foreground/50 shrink-0 mt-0.5" />
                     <div>
                       <p className="font-bold">Anonymous Guest Session:</p>
-                      <p className="text-white/70 text-[10px]">Temporary guest profiles receive <strong className="text-white">50 credits</strong> for trial exploration.</p>
+                      <p className="text-secondary-foreground/70 text-[10px]">Temporary guest profiles receive <strong className="text-secondary-foreground">50 credits</strong> for trial exploration.</p>
                     </div>
                   </div>
                 </div>
@@ -112,17 +112,17 @@ export default function CreditMeter() {
 
               {/* Transactions list */}
               <div className="pt-3">
-                <h4 className="font-bold text-white/60 mb-2 flex items-center gap-1.5 text-xs font-sans">
-                  <History className="w-3.5 h-3.5 text-white/60" />
+                <h4 className="font-bold text-card-foreground/60 mb-2 flex items-center gap-1.5 text-xs font-sans">
+                  <History className="w-3.5 h-3.5 text-card-foreground/60" />
                   Ledger History
                 </h4>
 
                 {isLoadingHistory ? (
                   <div className="flex justify-center py-4">
-                    <Loader2 className="w-5 h-5 animate-spin text-[#D35E43]" />
+                    <Loader2 className="w-5 h-5 animate-spin text-accent" />
                   </div>
                 ) : transactions.length === 0 ? (
-                  <p className="text-xs text-white/30 text-center py-4 font-medium font-sans">No transactions registered.</p>
+                  <p className="text-xs text-card-foreground/30 text-center py-4 font-medium font-sans">No transactions registered.</p>
                 ) : (
                   <div className="max-h-40 overflow-y-auto space-y-1.5 pr-1 font-sans tiny-scrollbar">
                     {transactions.map((tx) => {
@@ -132,24 +132,24 @@ export default function CreditMeter() {
                       return (
                         <div
                           key={tx.id}
-                          className="flex justify-between items-center gap-2 p-2 rounded-[12px] bg-[#301A15]/40 border border-[#4A2F29] hover:border-[#D35E43]/40 transition-all text-xs"
+                          className="flex justify-between items-center gap-2 p-2 rounded-[12px] bg-secondary/40 border border-border hover:border-accent/40 transition-all text-xs"
                         >
                           <div className="overflow-hidden flex-1">
-                            <p className="text-white truncate font-semibold" title={displayReason}>{displayReason}</p>
+                            <p className="text-card-foreground truncate font-semibold" title={displayReason}>{displayReason}</p>
                             <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                               {tx.model_used && (
-                                <span className="text-[9px] font-mono font-medium text-white/70 bg-[#4A2F29]/60 px-1 py-0.2 rounded border border-[#4A2F29]/80">
+                                <span className="text-[9px] font-mono font-medium text-secondary-foreground/70 bg-secondary px-1 py-0.5 rounded border border-border">
                                   {getModelDisplayName(tx.model_used, availableModels)}
                                 </span>
                               )}
-                              <span className="text-[9px] text-white/40 font-mono">
+                              <span className="text-[9px] text-card-foreground/40 font-mono">
                                 {new Date(tx.created_at).toLocaleDateString()}
                               </span>
                             </div>
                           </div>
                           <span
                             className={`font-bold font-mono shrink-0 ${
-                              tx.amount > 0 ? 'text-emerald-400' : 'text-[#D35E43]'
+                              tx.amount > 0 ? 'text-emerald-500' : 'text-accent'
                             }`}
                           >
                             {tx.amount > 0 ? `+${tx.amount}` : tx.amount}

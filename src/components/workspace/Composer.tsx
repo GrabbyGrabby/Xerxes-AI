@@ -312,16 +312,16 @@ export default function Composer() {
     <div className="w-full">
       {/* File upload status bar */}
       {uploadStatus && (
-        <div className="mb-2.5 p-3 rounded-2xl border border-white/10 bg-[#1F110E] text-xs flex items-center justify-between text-white/70">
+        <div className="mb-2.5 p-3 rounded-2xl border border-border bg-card text-xs flex items-center justify-between text-card-foreground/70">
           <div className="flex items-center gap-2">
-            <Loader2 className="w-3.5 h-3.5 text-[#D35E43] animate-spin" />
+            <Loader2 className="w-3.5 h-3.5 text-accent animate-spin" />
             <span className="truncate max-w-[200px]">Uploading <strong>{uploadStatus.filename}</strong></span>
-            <span className="text-[10px] text-white/50 font-semibold uppercase tracking-wider font-mono">
+            <span className="text-[10px] text-card-foreground/50 font-semibold uppercase tracking-wider font-mono">
               ({uploadStatus.progress.replace('_', ' ')})
             </span>
           </div>
           {uploadStatus.progress === 'error' && (
-            <span className="text-[#D35E43] font-bold text-[10px]">{uploadStatus.error}</span>
+            <span className="text-accent font-bold text-[10px]">{uploadStatus.error}</span>
           )}
         </div>
       )}
@@ -332,18 +332,18 @@ export default function Composer() {
           {attachments.map((file, i) => (
             <div
               key={i}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-[#301A15] text-xs text-white"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-secondary text-xs text-secondary-foreground"
             >
               {file.mimeType.startsWith('image/') ? (
                 <ImageIcon className="w-3.5 h-3.5 text-blue-400" />
               ) : (
-                <FileText className="w-3.5 h-3.5 text-[#D35E43]" />
+                <FileText className="w-3.5 h-3.5 text-accent" />
               )}
               <span className="max-w-[120px] truncate font-medium">{file.filename}</span>
               <button
                 type="button"
                 onClick={() => setAttachments((prev) => prev.filter((_, idx) => idx !== i))}
-                className="hover:text-[#D35E43] transition-colors cursor-pointer"
+                className="hover:text-accent transition-colors cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -352,8 +352,8 @@ export default function Composer() {
         </div>
       )}
 
-      {/* Premium Inverted Composer Card */}
-      <form onSubmit={handleSend} className="bg-[#ccfbf1] border border-[#1F110E]/15 rounded-[32px] p-3.5 relative shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:border-[#1F110E]/30 transition-colors duration-500">
+      {/* Premium Dynamic Composer Card */}
+      <form onSubmit={handleSend} className="bg-card backdrop-blur-2xl border border-border/30 rounded-[32px] p-3.5 relative shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:border-accent/40 transition-colors duration-500">
         <textarea
           ref={textareaRef}
           value={input}
@@ -362,18 +362,18 @@ export default function Composer() {
           placeholder="Ask models anything..."
           rows={1}
           disabled={isStreaming}
-          className="w-full bg-transparent border-0 text-sm text-[#1F110E] placeholder-[#1F110E]/50 focus:ring-0 focus:outline-none resize-none px-3.5 py-3 pr-14 leading-relaxed font-sans max-h-48 inside-text"
+          className="w-full bg-transparent border-0 text-sm text-card-foreground placeholder-card-foreground/50 focus:ring-0 focus:outline-none resize-none px-3.5 py-3 pr-14 leading-relaxed font-sans max-h-48 inside-text"
         />
 
         {/* Toolbar Row */}
-        <div className="flex items-center justify-between border-t border-[#1F110E]/15 pt-3 px-1 mt-2">
+        <div className="flex items-center justify-between border-t border-border/30 pt-3 px-1 mt-2">
           <div className="flex items-center gap-2">
             {/* Paperclip Button */}
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={isStreaming}
-              className="p-2.5 rounded-full border border-[#1F110E]/15 bg-[#1F110E]/10 text-[#1F110E] hover:bg-[#1F110E] hover:text-white hover:border-[#1F110E] transition-all duration-300 cursor-pointer disabled:opacity-50"
+              className="p-2.5 rounded-full border border-border/15 bg-card text-card-foreground hover:bg-foreground hover:text-background hover:border-transparent transition-all duration-300 cursor-pointer disabled:opacity-50"
             >
               <Paperclip className="w-4 h-4" />
             </button>
@@ -388,16 +388,16 @@ export default function Composer() {
             <ModelPicker />
           </div>
 
-          {/* Dark Brown Send Button */}
+          {/* Dynamic Send Button */}
           <button
             type="submit"
             disabled={(!input.trim() && attachments.length === 0) || isStreaming}
-            className="p-2.5 bg-[#1F110E] hover:bg-[#1F110E]/90 disabled:bg-[#1F110E]/20 disabled:text-[#1F110E]/30 active:scale-95 text-white rounded-full transition-all shadow-sm cursor-pointer"
+            className="p-2.5 bg-foreground hover:bg-foreground/90 disabled:bg-foreground/20 disabled:text-foreground/30 active:scale-95 text-background rounded-full transition-all shadow-sm cursor-pointer"
           >
             {isStreaming ? (
-              <Loader2 className="w-4 h-4 animate-spin text-white" />
+              <Loader2 className="w-4 h-4 animate-spin text-background" />
             ) : (
-              <ArrowUp className="w-4 h-4 text-white" />
+              <ArrowUp className="w-4 h-4 text-background" />
             )}
           </button>
         </div>

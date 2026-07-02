@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { PrivyProvider } from '@privy-io/react-auth';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from './ThemeContext';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   // Initialize QueryClient inside the component state to avoid sharing across users
@@ -35,7 +36,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       }}
     >
       <QueryClientProvider client={queryClient}>
-        {children}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </QueryClientProvider>
     </PrivyProvider>
   );

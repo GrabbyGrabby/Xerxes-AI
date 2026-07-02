@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useSessionStore } from '@/store/useSessionStore';
 import { usePrivy } from '@privy-io/react-auth';
 import { 
-  Menu, MessageSquare, Check, Loader2, Plus, LogIn, LogOut, MoreVertical, Edit2, Trash2, X
+  Menu, MessageSquare, Check, Loader2, Plus, LogIn, LogOut, MoreVertical, Edit2, Trash2, X, Sparkles
 } from 'lucide-react';
 import AmbientScene from '@/components/three/AmbientScene';
 import CreditMeter from '@/components/workspace/CreditMeter';
@@ -12,6 +12,11 @@ import MessageStream from '@/components/workspace/MessageStream';
 import Composer from '@/components/workspace/Composer';
 import UserDropdownCard from '@/components/workspace/UserDropdownCard';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Immersive Theme Components & Context
+import WavesBackground from '@/components/ui/WavesBackground';
+import InteractivePaletteCards from '@/components/ui/InteractivePaletteCards';
+import { useTheme } from '@/components/providers/ThemeContext';
 
 export default function WorkspacePage() {
   const { authenticated, login, logout, user, ready, getAccessToken } = usePrivy();
@@ -36,6 +41,7 @@ export default function WorkspacePage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isGuestMode, setIsGuestMode] = useState(false);
+  const { themeMode, setThemeMode, activeColors } = useTheme();
 
   // States for thread editing and deletion
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
@@ -285,56 +291,122 @@ export default function WorkspacePage() {
 
   if (showLogin) {
     return (
-      <main className="w-full h-[100dvh] overflow-hidden flex flex-col items-center justify-center relative bg-[#FAF9F6] font-sans">
-        {/* 3D background with rotating chrome sphere & gold/terracotta particles */}
-        <AmbientScene bgType="login" />
+      <main className="w-full h-[100dvh] overflow-y-auto md:overflow-hidden flex flex-col items-center justify-start md:justify-center relative font-sans py-12 md:py-0 select-none">
+        {/* Animated fluid waves background */}
+        <WavesBackground />
 
-        {/* Centered Professional Solid Black Card */}
-        <div className="z-10 flex flex-col items-center text-center p-8 md:p-12 bg-black border border-neutral-800 rounded-[36px] shadow-[0_24px_64px_rgba(0,0,0,0.12)] transition-all duration-500 max-w-md mx-4 select-none">
-          <div className="w-20 h-20 mb-6 bg-transparent">
-            {/* Smooth outline image logo */}
+        {/* Header Title for Mobile */}
+        <div className="md:hidden flex flex-col items-center text-center mb-6 z-10 select-none px-4">
+          <div className="w-14 h-14 mb-3">
             <img 
               src="/logo.png" 
               alt="Xerxes AI Logo" 
-              className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(255,255,255,0.18)]" 
+              className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.15)]" 
             />
           </div>
-          
-          {/* Solid white h1 text in Copperplate Gothic */}
-          <h1 className="font-header text-4xl md:text-5xl font-bold tracking-wide leading-none mb-3 text-white">
+          <h1 className="font-header text-4xl font-extrabold tracking-wide leading-none transition-colors duration-1000" style={{ color: '#000000' }}>
             Xerxes AI
           </h1>
-          <p className="font-header text-[10px] md:text-xs font-light text-[#7E6C68] tracking-widest mb-8 uppercase">
-            One Agent , Your All Workflows !
+          <p className="font-header text-sm font-bold tracking-wide mt-2 uppercase transition-colors duration-1000" style={{ color: '#000000' }}>
+            One Agent, All Your Workflows!
           </p>
+        </div>
 
-          <div className="flex flex-col gap-3 w-full items-center">
-            {/* Sign in with Privy */}
-            <button
-              onClick={() => login()}
-              className="w-56 h-11 bg-white hover:bg-white/90 text-[#1F110E] font-bold rounded-full text-xs transition-all duration-300 shadow-[0_4px_16px_rgba(255,255,255,0.05)] hover:scale-105 active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
+        {/* Interactive Split Layout container */}
+        <div className="z-10 w-full max-w-6xl px-4 md:px-8 flex flex-col md:flex-row items-center justify-center gap-10 md:gap-16">
+          
+          {/* Left Column: Interactive Palette Cards UI */}
+          <div className="flex-1 w-full flex flex-col items-center md:items-start text-center md:text-left">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="hidden md:flex flex-col mb-6 select-none"
             >
-              <LogIn className="w-4 h-4 shrink-0" />
-              <span>Sign In</span>
-            </button>
+              <div className="flex items-center gap-4 mb-2">
+                <div className="w-12 h-12">
+                  <img 
+                    src="/logo.png" 
+                    alt="Xerxes AI Logo" 
+                    className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.15)]" 
+                  />
+                </div>
+                <h1 className="font-header text-5xl md:text-6xl font-extrabold tracking-wide leading-none transition-colors duration-1000" style={{ color: '#000000' }}>
+                  Xerxes AI
+                </h1>
+              </div>
+              <p className="font-header text-lg md:text-xl font-bold tracking-wider mt-1 pl-1 text-left uppercase transition-colors duration-1000" style={{ color: '#000000' }}>
+                One Agent, All Your Workflows!
+              </p>
+            </motion.div>
 
-            {/* Guest Login */}
-            <button
-              onClick={handleGuestLogin}
-              className="w-56 h-11 bg-transparent hover:bg-white/5 text-white border border-white/20 hover:border-white/40 rounded-full text-xs font-semibold transition-all duration-300 hover:scale-105 active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, type: "spring" }}
+              className="w-full"
             >
-              <span>Explore as a Guest</span>
-            </button>
+              <InteractivePaletteCards isLanding={true} />
+            </motion.div>
           </div>
+
+          {/* Right Column: Glassmorphic Login Card */}
+          <motion.div 
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
+            className="flex flex-col items-center text-center p-8 md:p-12 bg-[#0A1931]/85 backdrop-blur-2xl border border-white/10 rounded-[36px] shadow-[0_24px_64px_rgba(0,0,0,0.3)] transition-all duration-500 max-w-sm w-full select-none"
+          >
+            <div className="w-20 h-20 mb-6 bg-transparent hidden md:block">
+              <img 
+                src="/logo.png" 
+                alt="Xerxes AI Logo" 
+                className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(255,255,255,0.18)]" 
+              />
+            </div>
+            
+            <h2 className="font-header text-2xl md:text-3xl font-bold tracking-wide leading-none mb-3 text-white">
+              Get Started
+            </h2>
+            <p className="text-xs text-white/60 leading-relaxed mb-8 max-w-[280px]">
+              Access your workflows, manage model routes, and explore next-gen AI assistance.
+            </p>
+
+            <div className="flex flex-col gap-3.5 w-full items-center">
+              {/* Sign in with Privy */}
+              <button
+                onClick={() => login()}
+                className="w-full h-12 bg-white hover:bg-white/90 text-black font-bold rounded-full text-xs transition-all duration-300 shadow-[0_4px_16px_rgba(255,255,255,0.05)] hover:scale-102 active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Sign In</span>
+              </button>
+
+              {/* Guest Login */}
+              <button
+                onClick={handleGuestLogin}
+                className="w-full h-12 bg-transparent hover:bg-white/5 text-white border border-white/20 hover:border-white/40 rounded-full text-xs font-semibold transition-all duration-300 hover:scale-102 active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Explore as a Guest</span>
+              </button>
+            </div>
+          </motion.div>
+
         </div>
       </main>
     );
   }
 
+  const activeTextClass = themeMode === 'plaster' ? 'text-[#800021]' : 'text-[#0A1931]';
+  const hoverTextClass = themeMode === 'plaster' ? 'hover:text-[#800021]' : 'hover:text-[#0A1931]';
+
   return (
-    <main className="w-full h-[100dvh] overflow-hidden flex flex-col relative bg-[#000000] text-[#FAF1EB] font-sans">
-      {/* 3D background with rotating chrome sphere */}
-      <AmbientScene />
+    <main className="w-full h-[100dvh] overflow-hidden flex flex-col relative bg-background text-foreground font-sans transition-colors duration-1000">
+      {/* Dynamic backdrop */}
+      {themeMode === 'default' ? (
+        <AmbientScene />
+      ) : (
+        <WavesBackground />
+      )}
 
       {/* MOBILE FLOATING MENU BUTTON: Floating top-left */}
       <motion.button
@@ -359,6 +431,32 @@ export default function WorkspacePage() {
         transition={{ type: 'spring', damping: 25, stiffness: 220 }}
         className="flex absolute top-4 right-4 z-30 items-center gap-3"
       >
+        {/* Compact Switcher Pill on Active Page */}
+        {(authenticated || isGuestMode) && (
+          <div className="flex items-center gap-1 p-1 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full shadow-lg select-none">
+            <button
+              onClick={() => setThemeMode('ocean')}
+              className={`py-1 px-2.5 text-[9px] font-bold rounded-full transition-all cursor-pointer ${
+                themeMode === 'ocean' || themeMode === 'default'
+                  ? 'bg-white text-black shadow-sm'
+                  : 'text-white/60 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              Ocean
+            </button>
+            <button
+              onClick={() => setThemeMode('plaster')}
+              className={`py-1 px-2.5 text-[9px] font-bold rounded-full transition-all cursor-pointer ${
+                themeMode === 'plaster'
+                  ? 'bg-white text-black shadow-sm'
+                  : 'text-white/60 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              Plaster
+            </button>
+          </div>
+        )}
+
         {(authenticated || isGuestMode) && <CreditMeter />}
         {authenticated ? (
           <UserDropdownCard />
@@ -408,7 +506,7 @@ export default function WorkspacePage() {
           onMouseLeave={() => setIsSidebarOpen(false)}
           animate={{ width: isSidebarOpen ? 260 : 72 }}
           transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-          className={`absolute md:relative h-[calc(100dvh-2rem)] my-4 md:ml-4 bg-[#ccfbf1] border border-[#1F110E]/15 rounded-[28px] flex flex-col justify-between py-6 z-50 select-none shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden shrink-0 text-[#1F110E] transition-transform duration-300 ${
+          className={`absolute md:relative h-[calc(100dvh-2rem)] my-4 md:ml-4 bg-card/85 backdrop-blur-2xl border border-border/30 rounded-[28px] flex flex-col justify-between py-6 z-50 select-none shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden shrink-0 text-card-foreground transition-transform duration-300 ${
             isSidebarOpen ? 'translate-x-4 md:translate-x-0' : '-translate-x-32 md:translate-x-0'
           }`}
         >
@@ -418,14 +516,14 @@ export default function WorkspacePage() {
             <div className="flex items-center gap-3 px-5 w-full h-8 overflow-hidden">
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="p-1.5 rounded-full text-[#1F110E] hover:bg-[#1F110E]/10 transition-all cursor-pointer shrink-0"
+                className="p-1.5 rounded-full text-card-foreground hover:bg-card-foreground/10 transition-all cursor-pointer shrink-0"
                 title="Toggle Sidebar"
               >
                 <Menu className="w-7 h-7" />
               </button>
               {isSidebarOpen && (
                 <div className="flex items-center select-none shrink-0">
-                  <span className="font-header font-bold text-sm tracking-wide text-[#1F110E]">
+                  <span className="font-header font-bold text-sm tracking-wide text-card-foreground">
                     Xerxes
                   </span>
                 </div>
@@ -436,9 +534,9 @@ export default function WorkspacePage() {
             <div className="px-3.5 w-full">
               <button
                 onClick={startNewChat}
-                className="w-full h-10 bg-[#1F110E]/10 border border-[#1F110E]/15 hover:bg-[#1F110E] hover:text-white text-[#1F110E] font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap"
+                className={`w-full h-10 bg-foreground/10 border border-border/15 hover:bg-white ${hoverTextClass} hover:shadow-sm text-card-foreground font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap`}
               >
-                <Plus className="w-4 h-4 shrink-0 text-[#D35E43]" />
+                <Plus className="w-4 h-4 shrink-0 text-accent" />
                 {isSidebarOpen && <span>New Chat</span>}
               </button>
             </div>
@@ -451,7 +549,7 @@ export default function WorkspacePage() {
                 <button
                   key={idx}
                   onClick={item.action}
-                  className="w-full h-10 bg-[#1F110E]/10 border border-[#1F110E]/15 hover:bg-[#1F110E] hover:text-white text-[#1F110E] font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap"
+                  className={`w-full h-10 bg-foreground/10 border border-border/15 hover:bg-white ${hoverTextClass} hover:shadow-sm text-card-foreground font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap`}
                 >
                   <div className="shrink-0">{item.icon}</div>
                   {isSidebarOpen && (
@@ -463,21 +561,21 @@ export default function WorkspacePage() {
 
             {/* Recent Conversations List - Loaded from Supabase */}
             {isSidebarOpen && (
-              <div className="w-full px-4 pt-3 border-t border-[#1F110E]/15 space-y-2">
-                <h4 className="text-[9px] uppercase font-bold tracking-wider text-[#1F110E]/40 font-header">
+              <div className="w-full px-4 pt-3 border-t border-border/15 space-y-2">
+                <h4 className="text-[9px] uppercase font-bold tracking-wider text-card-foreground/40 font-header">
                   Recent Threads
                 </h4>
                 <div className="space-y-1 max-h-48 overflow-y-auto pr-1 tiny-scrollbar">
                   {conversations.length === 0 ? (
-                    <p className="text-[10px] text-[#1F110E]/30 text-center py-2">No threads saved.</p>
+                    <p className="text-[10px] text-card-foreground/30 text-center py-2">No threads saved.</p>
                   ) : (
                     conversations.map((chat) => (
                       <div
                         key={chat.id}
-                        className={`relative group flex items-center justify-between p-1.5 rounded-[12px] transition-all ${
+                        className={`relative group flex items-center justify-between p-1.5 transition-all rounded-[12px] ${
                           activeConversationId === chat.id
-                            ? 'bg-[#1F110E]/10 text-[#1F110E] border-l-2 border-[#D35E43]'
-                            : 'text-[#1F110E]/80 hover:bg-[#1F110E]/5 hover:text-[#1F110E]'
+                            ? `bg-white ${activeTextClass} font-bold shadow-sm`
+                            : `text-card-foreground/70 hover:bg-white ${hoverTextClass} hover:font-bold hover:shadow-sm`
                         }`}
                       >
                         {renamingId === chat.id ? (
@@ -487,15 +585,15 @@ export default function WorkspacePage() {
                               value={renameTitle}
                               onChange={(e) => setRenameTitle(e.target.value)}
                               onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleRename(chat.id, renameTitle);
-                                if (e.key === 'Escape') setRenamingId(null);
+                                  if (e.key === 'Enter') handleRename(chat.id, renameTitle);
+                                  if (e.key === 'Escape') setRenamingId(null);
                               }}
-                              className="w-full bg-transparent border-b border-[#1F110E] text-[11px] text-[#1F110E] font-medium focus:outline-none focus:ring-0 px-0.5 py-0.5"
+                              className="w-full bg-transparent border-b border-border text-[11px] text-card-foreground font-medium focus:outline-none focus:ring-0 px-0.5 py-0.5"
                               autoFocus
                             />
                             <button
                               onClick={() => handleRename(chat.id, renameTitle)}
-                              className="p-1 hover:bg-[#1F110E]/10 rounded text-green-700 cursor-pointer"
+                              className="p-1 hover:bg-foreground/10 rounded text-green-700 cursor-pointer"
                               title="Save"
                             >
                               <Check className="w-3 h-3" />
@@ -518,13 +616,13 @@ export default function WorkspacePage() {
                               {chat.title || 'Untitled Thread'}
                             </button>
                             
-                            <div className="relative shrink-0 flex items-center">
+                             <div className="relative shrink-0 flex items-center">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setMenuOpenId(menuOpenId === chat.id ? null : chat.id);
                                 }}
-                                className="p-1 rounded-full text-[#1F110E]/60 hover:text-[#1F110E] hover:bg-[#1F110E]/10 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 cursor-pointer"
+                                className="p-1 rounded-full text-current opacity-60 hover:opacity-100 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 cursor-pointer"
                                 title="Thread Options"
                               >
                                 <MoreVertical className="w-3.5 h-3.5" />
@@ -541,7 +639,7 @@ export default function WorkspacePage() {
                                       initial={{ opacity: 0, scale: 0.95, y: -4 }}
                                       animate={{ opacity: 1, scale: 1, y: 0 }}
                                       exit={{ opacity: 0, scale: 0.95, y: -4 }}
-                                      className="absolute right-0 top-6 w-24 bg-[#1F110E] border border-[#4A2F29] rounded-[12px] py-1.5 z-40 shadow-lg text-[10px] text-white flex flex-col font-sans"
+                                      className="absolute right-0 top-6 w-24 bg-card border border-border rounded-[12px] py-1.5 z-40 shadow-lg text-[10px] text-card-foreground flex flex-col font-sans"
                                     >
                                       <button
                                         onClick={(e) => {
@@ -550,9 +648,9 @@ export default function WorkspacePage() {
                                           setRenamingId(chat.id);
                                           setMenuOpenId(null);
                                         }}
-                                        className="w-full text-left px-3 py-1.5 hover:bg-[#301A15] transition-all flex items-center gap-1.5 font-medium cursor-pointer"
+                                        className="w-full text-left px-3 py-1.5 hover:bg-secondary transition-all flex items-center gap-1.5 font-medium cursor-pointer"
                                       >
-                                        <Edit2 className="w-3 h-3 text-[#D35E43]" />
+                                        <Edit2 className="w-3 h-3 text-accent" />
                                         <span>Rename</span>
                                       </button>
                                       <button
@@ -561,7 +659,7 @@ export default function WorkspacePage() {
                                           setDeletingId(chat.id);
                                           setMenuOpenId(null);
                                         }}
-                                        className="w-full text-left px-3 py-1.5 hover:bg-[#301A15] transition-all flex items-center gap-1.5 font-medium text-red-400 cursor-pointer"
+                                        className="w-full text-left px-3 py-1.5 hover:bg-secondary transition-all flex items-center gap-1.5 font-medium text-red-400 cursor-pointer"
                                       >
                                         <Trash2 className="w-3 h-3 text-red-400" />
                                         <span>Delete</span>
@@ -585,15 +683,15 @@ export default function WorkspacePage() {
           <div className="flex flex-col items-center gap-5 w-full">
             <div className="px-3.5 w-full">
               {authenticated ? (
-                <div className="w-full bg-[#1F110E]/5 border border-[#1F110E]/15 rounded-[20px] p-3 flex flex-col items-center gap-2 overflow-hidden transition-all duration-300">
+                <div className="w-full bg-foreground/5 border border-border/15 rounded-[20px] p-3 flex flex-col items-center gap-2 overflow-hidden transition-all duration-300">
                   {isSidebarOpen ? (
                     <>
-                      <span className="text-[10px] font-semibold truncate max-w-full text-[#1F110E]/80">
+                      <span className="text-[10px] font-semibold truncate max-w-full text-card-foreground/80">
                         {user?.email?.address || 'Active User'}
                       </span>
                       <button
                         onClick={() => logout()}
-                        className="w-full py-1.5 bg-[#1F110E] text-white border border-[#1F110E] font-bold rounded-full text-[10px] transition-all flex items-center justify-center gap-1 cursor-pointer hover:opacity-90"
+                        className={`w-full py-1.5 bg-foreground text-background border border-transparent font-bold rounded-full text-[10px] transition-all flex items-center justify-center gap-1 cursor-pointer hover:bg-white ${hoverTextClass} hover:shadow-sm`}
                       >
                         Log out
                       </button>
@@ -601,7 +699,7 @@ export default function WorkspacePage() {
                   ) : (
                     <button
                       onClick={() => logout()}
-                      className="p-2 bg-[#1F110E] text-white border border-[#1F110E] rounded-full transition-all flex items-center justify-center cursor-pointer hover:opacity-90"
+                      className={`p-2 bg-foreground text-background border border-transparent rounded-full transition-all flex items-center justify-center cursor-pointer hover:bg-white ${hoverTextClass} hover:shadow-sm`}
                       title="Log out"
                     >
                       <LogOut className="w-4.5 h-4.5" />
@@ -609,15 +707,15 @@ export default function WorkspacePage() {
                   )}
                 </div>
               ) : isGuestMode ? (
-                <div className="w-full bg-[#1F110E]/5 border border-[#1F110E]/15 rounded-[20px] p-3 flex flex-col items-center gap-2 overflow-hidden transition-all duration-300">
+                <div className="w-full bg-foreground/5 border border-border/15 rounded-[20px] p-3 flex flex-col items-center gap-2 overflow-hidden transition-all duration-300">
                   {isSidebarOpen ? (
                     <>
-                      <span className="text-[10px] font-semibold truncate max-w-full text-[#1F110E]/60">
+                      <span className="text-[10px] font-semibold truncate max-w-full text-card-foreground/60">
                         Guest Explorer
                       </span>
                       <button
                         onClick={startNewChat}
-                        className="w-full py-1.5 bg-transparent border border-[#1F110E]/20 text-[#1F110E] font-bold rounded-full text-[10px] transition-all flex items-center justify-center gap-1 cursor-pointer hover:bg-[#1F110E]/5"
+                        className="w-full py-1.5 bg-transparent border border-border/20 text-card-foreground font-bold rounded-full text-[10px] transition-all flex items-center justify-center gap-1 cursor-pointer hover:bg-card-foreground/5"
                       >
                         Exit Mode
                       </button>
@@ -625,7 +723,7 @@ export default function WorkspacePage() {
                   ) : (
                     <button
                       onClick={startNewChat}
-                      className="p-2 bg-transparent border border-[#1F110E]/20 text-[#1F110E] rounded-full transition-all flex items-center justify-center cursor-pointer hover:bg-[#1F110E]/5"
+                      className="p-2 bg-transparent border border-border/20 text-card-foreground rounded-full transition-all flex items-center justify-center cursor-pointer hover:bg-card-foreground/5"
                       title="Exit Guest Mode"
                     >
                       <LogOut className="w-4.5 h-4.5" />
@@ -636,7 +734,7 @@ export default function WorkspacePage() {
                 <div className="w-full flex flex-col gap-2">
                   <button
                     onClick={() => login()}
-                    className="w-full h-10 bg-[#1F110E]/10 border border-[#1F110E]/15 hover:bg-[#1F110E] hover:text-white text-[#1F110E] font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap"
+                    className="w-full h-10 bg-foreground/10 border border-border/15 hover:bg-foreground hover:text-background text-card-foreground font-bold rounded-full text-xs transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer overflow-hidden whitespace-nowrap"
                   >
                     <LogIn className="w-4 h-4 shrink-0" />
                     {isSidebarOpen && <span>Sign In</span>}
@@ -674,7 +772,8 @@ export default function WorkspacePage() {
                 </motion.div>
                 <motion.h2
                   layoutId="xerxes-logo"
-                  className="font-header text-xl md:text-2xl font-bold text-[#FAF1EB] tracking-wide leading-none"
+                  className="font-header text-xl md:text-2xl font-bold tracking-wide leading-none"
+                  style={{ color: '#000000' }}
                   transition={{ type: 'spring', damping: 25, stiffness: 220 }}
                 >
                   Xerxes AI
@@ -682,7 +781,8 @@ export default function WorkspacePage() {
               </div>
               <motion.p
                 layoutId="xerxes-subtitle"
-                className="font-header text-[9px] md:text-[10px] font-light text-[#FAF1EB]/60 tracking-widest mt-0.5"
+                className="font-header text-[9px] md:text-[10px] font-light tracking-widest mt-0.5"
+                style={{ color: 'rgba(0,0,0,0.6)' }}
                 transition={{ type: 'spring', damping: 25, stiffness: 220 }}
               >
                 One Agent , Your All Workflows !
@@ -707,22 +807,22 @@ export default function WorkspacePage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-sm mx-4 bg-[#1F110E] border border-[#4A2F29] rounded-[28px] p-6 shadow-2xl text-white"
+              className="w-full max-w-sm mx-4 bg-card border border-border rounded-[28px] p-6 shadow-2xl text-card-foreground"
             >
-              <h3 className="font-header text-lg font-bold text-white mb-2">Delete Conversation?</h3>
-              <p className="text-xs text-[#FAF1EB]/60 leading-relaxed mb-6">
+              <h3 className="font-header text-lg font-bold mb-2">Delete Conversation?</h3>
+              <p className="text-xs text-card-foreground/60 leading-relaxed mb-6">
                 Are you sure you want to delete this thread? This will permanently erase the message history. This action cannot be undone.
               </p>
               <div className="flex gap-3 justify-end">
                 <button
                   onClick={() => setDeletingId(null)}
-                  className="px-4 py-2 bg-transparent hover:bg-white/5 border border-white/20 hover:border-white/30 text-xs font-semibold rounded-full transition-all cursor-pointer"
+                  className="px-4 py-2 bg-transparent hover:bg-foreground/5 border border-border/20 hover:border-border/30 text-xs font-semibold rounded-full transition-all cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => handleDelete(deletingId)}
-                  className="px-4 py-2 bg-[#D35E43] hover:bg-[#D35E43]/90 text-xs font-semibold rounded-full transition-all cursor-pointer shadow-sm"
+                  className="px-4 py-2 bg-accent hover:bg-accent/90 text-accent-foreground text-xs font-semibold rounded-full transition-all cursor-pointer shadow-sm"
                 >
                   Delete Thread
                 </button>

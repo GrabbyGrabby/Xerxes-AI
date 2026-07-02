@@ -7,6 +7,7 @@ import { Bot, User, Copy, Check, ArrowRight, Compass, ShieldAlert, Cpu } from 'l
 import { motion, AnimatePresence } from 'framer-motion';
 import AgentStepCard from './AgentStepCard';
 import XerxesSphere from '../three/XerxesSphere';
+import { useTheme } from '../providers/ThemeContext';
 
 const getModelDisplayName = (modelId: string | undefined, availableModels: any[]) => {
   if (!modelId) return '';
@@ -27,6 +28,7 @@ const getModelDisplayName = (modelId: string | undefined, availableModels: any[]
 
 export default function MessageStream() {
   const { user } = usePrivy();
+  const { themeMode } = useTheme();
   const messages = useSessionStore((state) => state.messages);
   const activeToolCalls = useSessionStore((state) => state.activeToolCalls);
   const isStreaming = useSessionStore((state) => state.isStreaming);
@@ -35,6 +37,24 @@ export default function MessageStream() {
   const containerRef = useRef<HTMLDivElement>(null);
   
   const [copiedMessageIndex, setCopiedMessageIndex] = useState<number | null>(null);
+
+  // Thinking phrases cycling logic
+  const [thinkingPhraseIndex, setThinkingPhraseIndex] = useState(0);
+  const thinkingPhrases = ['Thinking...', 'Scraping web...', 'Exploring...', 'Synthesizing...'];
+
+  useEffect(() => {
+    let interval: any;
+    if (isStreaming) {
+      interval = setInterval(() => {
+        setThinkingPhraseIndex((prev) => (prev + 1) % 4);
+      }, 1500);
+    } else {
+      setThinkingPhraseIndex(0);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isStreaming]);
 
   // Auto-scroll helper
   useEffect(() => {
@@ -95,28 +115,34 @@ export default function MessageStream() {
             initial={{ scale: 0.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="w-28 h-28 mb-2 bg-transparent shrink-0 filter drop-shadow-[0_4px_10px_rgba(0,0,0,0.3)] hover:drop-shadow-[0_10px_20px_rgba(0,0,0,0.45)] transition-all duration-300 cursor-pointer"
+            className="w-28 h-28 mb-2 bg-transparent shrink-0 hover:scale-105 transition-all duration-300 cursor-pointer"
           >
-            <img src="/logo.png" alt="Xerxes AI Logo" className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(255,255,255,0.18)]" />
+            <img 
+              src="/logo.png" 
+              alt="Xerxes AI Logo" 
+              className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(255,255,255,0.18)]" 
+            />
           </motion.div>
 
-          {/* Xerxes AI Bold Copperplate gothic */}
+          {/* Xerxes AI Bold title */}
           <motion.h2 
             layoutId="xerxes-logo"
             initial={{ scale: 0.8, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="font-header text-5xl md:text-7xl font-bold text-[#FAF1EB] tracking-wide leading-none drop-shadow-2xl shadow-black/10 cursor-pointer"
+            className="font-header text-5xl md:text-7xl font-bold tracking-wide leading-none drop-shadow-2xl shadow-black/10 cursor-pointer transition-colors duration-1000"
+            style={{ color: '#000000' }}
           >
             Xerxes AI
           </motion.h2>
-          {/* One Agent , Your All Workflows thin Copperplate gothic */}
+          {/* One Agent Tagline */}
           <motion.p 
             layoutId="xerxes-subtitle"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="font-header text-sm md:text-lg font-light text-[#FAF1EB]/50 tracking-widest mt-1"
+            className="font-header text-sm md:text-lg font-light tracking-widest mt-1 transition-colors duration-1000"
+            style={{ color: 'rgba(0,0,0,0.6)' }}
           >
             One Agent , Your All Workflows !
           </motion.p>
@@ -143,29 +169,29 @@ export default function MessageStream() {
                 >
                   {/* Left avatar */}
                   {!isUser && (
-                    <div className="w-8 h-8 rounded-full bg-[#301A15]/5 border border-[#301A15]/15 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(48,26,21,0.03)] mt-0.5">
-                      <Bot className="w-4 h-4 text-[#301A15]" />
+                    <div className="w-8 h-8 rounded-full bg-secondary border border-border/15 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.03)] mt-0.5">
+                      <Bot className="w-4 h-4 text-foreground" />
                     </div>
                   )}
 
-                  {/* Message bubble wrapper */}
+                   {/* Message bubble wrapper */}
                   <div className="flex flex-col gap-1.5 max-w-[85%]">
-                    <div className="flex items-center gap-1.5 px-1.5 text-[10px] text-[#7E6C68] font-semibold tracking-wide font-sans">
+                    <div className="flex items-center gap-1.5 px-1.5 text-[10px] text-foreground/70 font-semibold tracking-wide font-sans">
                       <span>{isUser ? (user?.email?.address || 'User') : 'Xerxes'}</span>
                       {!isUser && msgModelId && (
                         <>
-                          <span className="text-[#7E6C68]/40">•</span>
-                          <span className="text-[9px] text-[#7E6C68]/80 font-normal font-mono flex items-center gap-0.5 bg-[#FAF1EB] px-1.5 py-0.5 rounded-md border border-[#EFE0D4]/60">
-                            <Cpu className="w-2.5 h-2.5 opacity-70 text-[#7E6C68]/60" />
+                          <span className="opacity-40">•</span>
+                          <span className="text-[9px] text-black font-semibold font-mono flex items-center gap-0.5 bg-white/85 px-1.5 py-0.5 rounded-md border border-black/10 shadow-sm">
+                            <Cpu className="w-2.5 h-2.5 opacity-70 text-black/60" />
                             {getModelDisplayName(msgModelId, availableModels)}
                           </span>
                         </>
                       )}
                     </div>
 
-                    {/* Chat Bubble - Consistent light beige theme */}
+                    {/* Chat Bubble - Dynamic theme layout */}
                     <div
-                      className={`rounded-[24px] text-xs leading-relaxed border border-[#EFE0D4] bg-[#F5EAE1] text-[#301A15] shadow-[0_4px_16px_rgba(0,0,0,0.25)] inside-text ${
+                      className={`rounded-[24px] text-xs leading-relaxed border bg-card text-card-foreground border-border/60 shadow-[0_4px_16px_rgba(0,0,0,0.15)] inside-text ${
                         msg.content === '' && isLast && isStreaming && activeToolCalls.length === 0
                           ? 'px-3 py-1.5'
                           : 'px-4.5 py-3.5'
@@ -178,8 +204,8 @@ export default function MessageStream() {
                           // Small black chrome loader sphere next to text indicator
                           <div className="flex items-center gap-2 py-1.5">
                             <XerxesSphere size="small" />
-                            <span className="text-[11px] font-bold font-mono animate-pulse text-[#301A15]">
-                              Thinking...
+                            <span className="text-[11px] font-bold font-mono text-card-foreground">
+                              {thinkingPhrases[thinkingPhraseIndex]}
                             </span>
                           </div>
                         ) : (
@@ -197,7 +223,7 @@ export default function MessageStream() {
                             setCopiedMessageIndex(index);
                             setTimeout(() => setCopiedMessageIndex(null), 2000);
                           }}
-                          className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-[#7E6C68]/60 hover:text-[#301A15] hover:bg-[#F5EAE1]/40 border border-transparent hover:border-[#EFE0D4]/50 transition-all cursor-pointer font-sans"
+                          className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-muted-foreground/60 hover:text-foreground hover:bg-card/40 border border-transparent hover:border-border/50 transition-all cursor-pointer font-sans"
                         >
                           {copiedMessageIndex === index ? (
                             <>
@@ -226,8 +252,8 @@ export default function MessageStream() {
 
                   {/* Right avatar */}
                   {isUser && (
-                    <div className="w-8 h-8 rounded-full bg-white border border-[#EFE0D4] flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(48,26,21,0.03)] mt-0.5">
-                      <User className="w-4 h-4 text-[#301A15]" />
+                    <div className="w-8 h-8 rounded-full bg-secondary border border-border/15 flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.03)] mt-0.5">
+                      <User className="w-4 h-4 text-foreground" />
                     </div>
                   )}
                 </motion.div>
