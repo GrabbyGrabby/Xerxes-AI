@@ -62,6 +62,16 @@ export default function WorkspacePage() {
     }
   }, []);
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // When Privy finishes logging in, automatically exit Guest Mode
   useEffect(() => {
     if (authenticated) {
@@ -503,12 +513,12 @@ export default function WorkspacePage() {
         </AnimatePresence>
         {/* Collapsible Left Sidebar */}
         <motion.aside
-          onMouseEnter={() => setIsSidebarOpen(true)}
-          onMouseLeave={() => setIsSidebarOpen(false)}
-          animate={{ width: isSidebarOpen ? 260 : 72 }}
+          onMouseEnter={() => !isMobile && setIsSidebarOpen(true)}
+          onMouseLeave={() => !isMobile && setIsSidebarOpen(false)}
+          animate={{ width: (isMobile && !isSidebarOpen) ? 0 : (isSidebarOpen ? 260 : 72) }}
           transition={{ type: 'spring', damping: 26, stiffness: 220 }}
           className={`absolute md:relative h-[calc(100dvh-2rem)] my-4 md:ml-4 bg-card backdrop-blur-2xl border border-border/30 rounded-[28px] flex flex-col justify-between py-6 z-50 select-none shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden shrink-0 text-card-foreground transition-transform duration-300 ${
-            isSidebarOpen ? 'translate-x-4 md:translate-x-0' : '-translate-x-32 md:translate-x-0'
+            isSidebarOpen ? 'left-0 translate-x-4 md:translate-x-0' : 'left-0 -translate-x-full md:translate-x-0'
           }`}
         >
           {/* Top Panel Actions */}
