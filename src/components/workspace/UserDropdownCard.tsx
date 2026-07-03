@@ -30,15 +30,15 @@ export default function UserDropdownCard() {
       {/* Inverted theme trigger button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 rounded-full border border-border/15 bg-card hover:bg-card/90 transition-all text-xs text-card-foreground shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer select-none font-bold"
+        className="flex items-center gap-1.5 px-2 py-2 md:px-4 md:py-2 rounded-full border border-border/15 bg-card hover:bg-card/90 transition-all text-xs text-card-foreground shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer select-none font-bold"
       >
         <div className="w-5 h-5 rounded-full bg-foreground/10 border border-border/15 flex items-center justify-center shrink-0">
           <User className="w-3 h-3 text-card-foreground" />
         </div>
-        <span className="font-semibold max-w-[120px] truncate">
+        <span className="font-semibold max-w-[120px] truncate hidden md:inline">
           {authenticated ? (user?.email?.address || 'Active User') : 'Guest Explorer'}
         </span>
-        <ChevronDown className="w-3.5 h-3.5 opacity-60 shrink-0 text-card-foreground" />
+        <ChevronDown className="w-3.5 h-3.5 opacity-60 shrink-0 text-card-foreground hidden md:block" />
       </button>
 
       {/* Theme adaptive dropdown panel */}

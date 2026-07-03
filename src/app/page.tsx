@@ -432,7 +432,7 @@ export default function WorkspacePage() {
       >
         <Menu className="w-4 h-4 text-card-foreground" />
       </motion.button>
-
+ 
       {/* FLOATING CONTROLS: Placed absolute top right for both desktop and mobile */}
       <motion.div
         animate={{
@@ -440,7 +440,7 @@ export default function WorkspacePage() {
           opacity: (showTopControls || messages.length === 0) ? 1 : 0
         }}
         transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-        className="flex absolute top-4 right-4 z-30 items-center gap-3"
+        className="flex absolute top-4 right-4 z-30 items-center gap-2.5"
       >
         {/* Compact Switcher Pill on Active Page */}
         {(authenticated || isGuestMode) && (
@@ -468,16 +468,15 @@ export default function WorkspacePage() {
           </div>
         )}
 
-        {(authenticated || isGuestMode) && <CreditMeter />}
         {authenticated ? (
           <UserDropdownCard />
         ) : (
           <button
             onClick={() => login()}
-            className="w-9 h-9 rounded-full bg-[#301A15] border border-[#4A2F29] flex items-center justify-center hover:bg-[#47271F] hover:scale-105 active:scale-95 transition-all shadow-sm cursor-pointer select-none"
+            className="w-9 h-9 rounded-full bg-card border border-border/30 flex items-center justify-center hover:bg-card/85 hover:scale-105 active:scale-95 transition-all shadow-sm cursor-pointer select-none text-card-foreground"
             title="Log In / Sign Up"
           >
-            <LogIn className="w-4 h-4 text-white" />
+            <LogIn className="w-4 h-4 text-card-foreground" />
           </button>
         )}
       </motion.div>
@@ -694,6 +693,13 @@ export default function WorkspacePage() {
 
           {/* Bottom Panel Actions: Authentication */}
           <div className="flex flex-col items-center gap-5 w-full">
+            {/* Credit Meter (in sidebar for both desktop and mobile when open) */}
+            {isSidebarOpen && (authenticated || isGuestMode) && (
+              <div className="px-3.5 w-full flex justify-center scale-95 shrink-0">
+                <CreditMeter />
+              </div>
+            )}
+
             <div className="px-3.5 w-full">
               {authenticated ? (
                 <div className="w-full bg-foreground/5 border border-border/15 rounded-[20px] p-3 flex flex-col items-center gap-2 overflow-hidden transition-all duration-300">

@@ -6,6 +6,8 @@ import { ToolStatus } from '@/store/useSessionStore';
 import { motion } from 'framer-motion';
 
 export default function AgentStepCard({ step }: { step: ToolStatus }) {
+  if (step.name === 'web_search') return null;
+
   const [isExpanded, setIsExpanded] = useState(false);
 
   const isRunning = step.status === 'running';

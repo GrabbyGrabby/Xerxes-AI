@@ -61,19 +61,19 @@ export const PLASTER_PALETTE: ColorPalette = {
   labels: ['#7192A1', '#EADFCB', '#C08E66', '#186667', '#042842', '#FFCC4C'],
   visualColors: ['#7192A1', '#EADFCB', '#C08E66', '#BE5731', '#042842', '#FAF5EF'], // Corrected visuals for Rust/Cream
   themeColors: {
-    background: '#881144',         // Plum red background on main page
-    foreground: '#FAF5EF',         // Milky cream text on main page background for readability
+    background: '#FAF5EF',         // Milky/off-white background
+    foreground: '#800021',         // Deep burgundy text
     card: '#800021',               // Deep burgundy card/sidebar/composer/bubbles
     cardForeground: '#FAF5EF',     // Milky cream text on card
-    primary: '#EADFCB',            // Warm cream accent
-    primaryForeground: '#800021',
-    secondary: '#7192A1',          // Slate Blue
+    primary: '#7192A1',            // Slate Blue
+    primaryForeground: '#FAF5EF',
+    secondary: '#881144',          // Plum
     secondaryForeground: '#FAF5EF',
-    muted: '#800021',
-    mutedForeground: '#FAF5EF',
-    accent: '#FAF5EF',             // Milky cream accent
-    accentForeground: '#800021',
-    border: '#800021',             // Deep burgundy border
+    muted: '#FAF5EF',
+    mutedForeground: '#7192A1',    // Slate blue for muted labels
+    accent: '#800021',             // Deep burgundy accent
+    accentForeground: '#FAF5EF',
+    border: '#881144',             // Plum border
     ring: '#800021',
   }
 };

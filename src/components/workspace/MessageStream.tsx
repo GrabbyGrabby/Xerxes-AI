@@ -175,7 +175,16 @@ export default function MessageStream() {
                    {/* Message bubble wrapper */}
                   <div className="flex flex-col gap-1.5 max-w-[85%]">
                     <div className="flex items-center gap-1.5 px-1.5 text-[10px] text-foreground/70 font-semibold tracking-wide font-sans">
-                      <span>{isUser ? (user?.email?.address || 'User') : 'Xerxes'}</span>
+                      <span>
+                        {isUser ? (
+                          <>
+                            <span className="hidden md:inline">{user?.email?.address || 'User'}</span>
+                            <span className="inline md:hidden">User</span>
+                          </>
+                        ) : (
+                          'Xerxes'
+                        )}
+                      </span>
                       {!isUser && msgModelId && (
                         <>
                           <span className="opacity-40">•</span>
@@ -189,6 +198,11 @@ export default function MessageStream() {
 
                     {/* Chat Bubble - Dynamic theme layout */}
                     <div
+                      style={(!isUser && (themeMode === 'ocean' || themeMode === 'plaster')) ? {
+                        backgroundColor: '#F6FAFD',
+                        color: themeMode === 'plaster' ? '#800021' : '#042842',
+                        borderColor: '#E2E8F0'
+                      } : {}}
                       className={`rounded-[24px] text-xs leading-relaxed border bg-card text-card-foreground border-border/60 shadow-[0_4px_16px_rgba(0,0,0,0.15)] inside-text ${
                         msg.content === '' && isLast && isStreaming && activeToolCalls.length === 0
                           ? 'px-3 py-1.5'
@@ -202,8 +216,8 @@ export default function MessageStream() {
                           // Small black chrome loader sphere next to text indicator
                           <div className="flex items-center gap-2 py-1.5">
                             <XerxesSphere size="small" />
-                            <span className="text-[11px] font-bold font-mono text-card-foreground">
-                              {thinkingPhrases[thinkingPhraseIndex]}
+                            <span className="text-[11px] font-bold font-sans text-current opacity-90">
+                              Thinking...
                             </span>
                           </div>
                         ) : (
@@ -289,7 +303,7 @@ function formatContent(text: string, isUser: boolean) {
           <XerxesSphere size="small" />
           {/* the thinking part is not visible make the text white */}
           <span className="text-white text-[10px] hidden whitespace-pre-wrap leading-relaxed opacity-60 italic">{block.content}</span>
-          <span className="text-white text-[11px] font-bold font-mono animate-pulse">Reasoning...</span>
+          <span className="text-white text-[11px] font-bold font-sans animate-pulse">Thinking...</span>
         </div>
       );
     }
