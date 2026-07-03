@@ -37,17 +37,17 @@ export const OCEAN_PALETTE: ColorPalette = {
   labels: ['0A1931', 'B3CFE5', '4A7FA7', '1A3D63', 'F6FAFD'],
   visualColors: ['#0A1931', '#B3CFE5', '#4A7FA7', '#1A3D63', '#F6FAFD'],
   themeColors: {
-    background: '#FFCC4C',         // Warm sand/yellow background on main page
+    background: '#4A7FA7',         // Medium blue background on main page
     foreground: '#042842',         // Deep navy text on main page background
     card: '#042842',               // Deep navy card/sidebar/composer/picker/credits
     cardForeground: '#FAF5EF',     // Light cream text on cards
-    primary: '#FFCC4C',            // Accent color matching background
+    primary: '#B3CFE5',            // Light blue accent matching palette
     primaryForeground: '#042842',
     secondary: '#1A3D63',          // Medium navy
     secondaryForeground: '#F6FAFD',
-    muted: '#FFCC4C',
-    mutedForeground: '#4A7FA7',
-    accent: '#FFCC4C',             // Highlight accent
+    muted: '#1A3D63',
+    mutedForeground: '#B3CFE5',
+    accent: '#B3CFE5',             // Highlight accent
     accentForeground: '#042842',
     border: '#1A3D63',             // Medium navy border
     ring: '#042842',
@@ -61,19 +61,19 @@ export const PLASTER_PALETTE: ColorPalette = {
   labels: ['#7192A1', '#EADFCB', '#C08E66', '#186667', '#042842', '#FFCC4C'],
   visualColors: ['#7192A1', '#EADFCB', '#C08E66', '#BE5731', '#042842', '#FAF5EF'], // Corrected visuals for Rust/Cream
   themeColors: {
-    background: '#FAF5EF',         // Milky/off-white background
-    foreground: '#800021',         // Deep burgundy text
+    background: '#881144',         // Plum red background on main page
+    foreground: '#FAF5EF',         // Milky cream text on main page background for readability
     card: '#800021',               // Deep burgundy card/sidebar/composer/bubbles
     cardForeground: '#FAF5EF',     // Milky cream text on card
-    primary: '#7192A1',            // Slate Blue
-    primaryForeground: '#FAF5EF',
-    secondary: '#881144',          // Plum
+    primary: '#EADFCB',            // Warm cream accent
+    primaryForeground: '#800021',
+    secondary: '#7192A1',          // Slate Blue
     secondaryForeground: '#FAF5EF',
-    muted: '#FAF5EF',
-    mutedForeground: '#7192A1',    // Slate blue for muted labels
-    accent: '#800021',             // Deep burgundy accent
-    accentForeground: '#FAF5EF',
-    border: '#881144',             // Plum border
+    muted: '#800021',
+    mutedForeground: '#FAF5EF',
+    accent: '#FAF5EF',             // Milky cream accent
+    accentForeground: '#800021',
+    border: '#800021',             // Deep burgundy border
     ring: '#800021',
   }
 };

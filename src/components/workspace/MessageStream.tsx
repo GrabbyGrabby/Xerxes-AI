@@ -120,7 +120,7 @@ export default function MessageStream() {
             <img 
               src="/logo.png" 
               alt="Xerxes AI Logo" 
-              className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(255,255,255,0.18)]" 
+              className="w-full h-full object-contain filter drop-shadow-[0_4px_20px_rgba(0,0,0,0.65)] drop-shadow-[0_0_2px_rgba(0,0,0,0.85)]" 
             />
           </motion.div>
 
@@ -130,8 +130,7 @@ export default function MessageStream() {
             initial={{ scale: 0.8, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="font-header text-5xl md:text-7xl font-bold tracking-wide leading-none drop-shadow-2xl shadow-black/10 cursor-pointer transition-colors duration-1000"
-            style={{ color: '#000000' }}
+            className="font-header text-5xl md:text-7xl font-bold tracking-wide leading-none drop-shadow-2xl shadow-black/10 cursor-pointer transition-colors duration-1000 text-foreground"
           >
             Xerxes AI
           </motion.h2>
@@ -141,8 +140,7 @@ export default function MessageStream() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="font-header text-sm md:text-lg font-light tracking-widest mt-1 transition-colors duration-1000"
-            style={{ color: 'rgba(0,0,0,0.6)' }}
+            className="font-header text-sm md:text-lg font-light tracking-widest mt-1 transition-colors duration-1000 text-foreground/60"
           >
             One Agent , Your All Workflows !
           </motion.p>

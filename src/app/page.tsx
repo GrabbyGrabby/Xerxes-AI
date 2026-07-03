@@ -427,10 +427,10 @@ export default function WorkspacePage() {
         }}
         transition={{ type: 'spring', damping: 25, stiffness: 220 }}
         onClick={() => setIsSidebarOpen(true)}
-        className="md:hidden absolute top-4 left-4 z-30 w-9 h-9 rounded-full bg-[#301A15] border border-[#4A2F29] flex items-center justify-center text-white hover:bg-[#47271F] hover:scale-105 active:scale-95 transition-all shadow-sm cursor-pointer select-none"
+        className="md:hidden absolute top-4 left-4 z-30 w-9 h-9 rounded-full bg-card border border-border/30 flex items-center justify-center text-card-foreground hover:bg-card/85 hover:scale-105 active:scale-95 transition-all shadow-sm cursor-pointer select-none"
         title="Open Sidebar"
       >
-        <Menu className="w-4 h-4 text-white" />
+        <Menu className="w-4 h-4 text-card-foreground" />
       </motion.button>
 
       {/* FLOATING CONTROLS: Placed absolute top right for both desktop and mobile */}
@@ -515,11 +515,13 @@ export default function WorkspacePage() {
         <motion.aside
           onMouseEnter={() => !isMobile && setIsSidebarOpen(true)}
           onMouseLeave={() => !isMobile && setIsSidebarOpen(false)}
-          animate={{ width: (isMobile && !isSidebarOpen) ? 0 : (isSidebarOpen ? 260 : 72) }}
+          initial={false}
+          animate={{ 
+            width: isMobile ? 260 : (isSidebarOpen ? 260 : 72),
+            x: isMobile ? (isSidebarOpen ? 16 : -280) : 0
+          }}
           transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-          className={`absolute md:relative h-[calc(100dvh-2rem)] my-4 md:ml-4 bg-card backdrop-blur-2xl border border-border/30 rounded-[28px] flex flex-col justify-between py-6 z-50 select-none shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden shrink-0 text-card-foreground transition-transform duration-300 ${
-            isSidebarOpen ? 'left-0 translate-x-4 md:translate-x-0' : 'left-0 -translate-x-full md:translate-x-0'
-          }`}
+          className="absolute md:relative h-[calc(100dvh-2rem)] my-4 md:ml-4 bg-card backdrop-blur-2xl border border-border/30 rounded-[28px] flex flex-col justify-between py-6 z-50 select-none shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden shrink-0 text-card-foreground left-0"
         >
           {/* Top Panel Actions */}
           <div className="space-y-6 flex flex-col items-center w-full">
@@ -779,12 +781,11 @@ export default function WorkspacePage() {
                   className="w-8 h-8 bg-transparent shrink-0"
                   transition={{ type: 'spring', damping: 25, stiffness: 220 }}
                 >
-                  <img src="/logo.png" alt="Logo" className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]" />
+                  <img src="/logo.png" alt="Logo" className="w-full h-full object-contain filter drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)] drop-shadow-[0_0_1px_rgba(0,0,0,0.85)]" />
                 </motion.div>
                 <motion.h2
                   layoutId="xerxes-logo"
-                  className="font-header text-xl md:text-2xl font-bold tracking-wide leading-none"
-                  style={{ color: '#000000' }}
+                  className="font-header text-xl md:text-2xl font-bold tracking-wide leading-none text-foreground"
                   transition={{ type: 'spring', damping: 25, stiffness: 220 }}
                 >
                   Xerxes AI
@@ -792,8 +793,7 @@ export default function WorkspacePage() {
               </div>
               <motion.p
                 layoutId="xerxes-subtitle"
-                className="font-header text-[9px] md:text-[10px] font-light tracking-widest mt-0.5"
-                style={{ color: 'rgba(0,0,0,0.6)' }}
+                className="font-header text-[9px] md:text-[10px] font-light tracking-widest mt-0.5 text-foreground/60"
                 transition={{ type: 'spring', damping: 25, stiffness: 220 }}
               >
                 One Agent , Your All Workflows !

@@ -176,11 +176,13 @@ export default function WavesBackground({ isLoginPage = false }: { isLoginPage?:
       ) : (
         // ================= WARM PLASTER (HOODIE / CLAY) THEME =================
         <div className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden">
-          {/* Base Wall Color with Plaster Gradient */}
+          {/* Base Wall Color with Plaster Gradient (milky cream for login page, #881144 for main page) */}
           <div 
             className="absolute inset-0 transition-all duration-1000"
             style={{
-              background: `radial-gradient(circle at 20% 20%, #EFECE6 0%, #D8D5CE 50%, #C4C0B7 100%)`,
+              background: isLoginPage 
+                ? `radial-gradient(circle at 20% 20%, #EFECE6 0%, #D8D5CE 50%, #C4C0B7 100%)`
+                : `#881144`,
             }}
           />
 
